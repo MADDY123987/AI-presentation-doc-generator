@@ -4,7 +4,6 @@ import "./AuthPage.css";
 import { BASE_URL } from "../../config";
 
 // Use deployed backend (Render), not localhost
-// Example: https://ai-doc-backend-hecs.onrender.com
 const API_BASE = BASE_URL;
 
 function AuthPage({ onBackHome, onLogin }) {
@@ -24,7 +23,7 @@ function AuthPage({ onBackHome, onLogin }) {
         const res = await fetch(`${API_BASE}/auth/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }), // backend ignores name
+          body: JSON.stringify({ email, password }),
         });
 
         const data = await res.json();
@@ -50,11 +49,9 @@ function AuthPage({ onBackHome, onLogin }) {
         const token = data.access_token;
         if (!token) throw new Error("No access token received");
 
-        // Save token + email
         localStorage.setItem("authToken", token);
         localStorage.setItem("authEmail", email);
 
-        // ---------- Fetch current user ----------
         const meRes = await fetch(`${API_BASE}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
