@@ -1,7 +1,7 @@
 // src/components/auth/AuthPage.jsx
 import React, { useState } from "react";
 import "./AuthPage.css";
-import { AUTH_BASE_URL } from "../../config"; // <-- IMPORTANT FIX
+import { AUTH_BASE_URL } from "../../config"; 
 
 function AuthPage({ onBackHome, onLogin }) {
   const [mode, setMode] = useState("login");
@@ -19,22 +19,37 @@ function AuthPage({ onBackHome, onLogin }) {
         const res = await fetch(`${AUTH_BASE_URL}/auth/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({
+            email: email.trim(),
+            password,
+            is_active: true,
+            is_superuser: false,
+            is_verified: false,
+          }),
         });
 
         const data = await res.json();
         if (!res.ok) throw new Error(data.detail || "Registration failed");
 
-        alert("Registered! Now login.");
+        alert("Registration successful! Please login now.");
         setMode("login");
-      } else {
+      } 
+      else {
+        // 🔐 LOGIN EXACTLY LIKE SWAGGER WORKING CURL
         const form = new URLSearchParams();
-        form.append("username", email);
+        form.append("grant_type", "password");
+        form.append("username", email.trim());
         form.append("password", password);
+        form.append("scope", "");
+        form.append("client_id", "string");
+        form.append("client_secret", "string");
 
         const res = await fetch(`${AUTH_BASE_URL}/auth/jwt/login`, {
           method: "POST",
-          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+            Accept: "application/json",
+          },
           body: form.toString(),
         });
 
@@ -42,26 +57,29 @@ function AuthPage({ onBackHome, onLogin }) {
         if (!res.ok) throw new Error(data.detail || "Login failed");
 
         const token = data.access_token;
-        if (!token) throw new Error("No access token received");
+        if (!token) throw new Error("Invalid token response");
 
+        // store token + email
         localStorage.setItem("authToken", token);
-        localStorage.setItem("authEmail", email);
+        localStorage.setItem("authEmail", email.trim());
 
+        // Load user profile
         const meRes = await fetch(`${AUTH_BASE_URL}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         const me = await meRes.json();
-        if (!meRes.ok) throw new Error(me.detail || "Failed to load user");
+        if (!meRes.ok) throw new Error(me.detail || "User info load failed");
 
         localStorage.setItem("authUser", JSON.stringify(me));
         if (onLogin) onLogin(me);
 
-        alert("Logged in!");
+        alert("Login successful!");
         if (onBackHome) onBackHome();
       }
     } catch (err) {
       alert(err.message);
+      console.error("Auth error:", err);
     } finally {
       setLoading(false);
     }
@@ -71,9 +89,7 @@ function AuthPage({ onBackHome, onLogin }) {
     <div className="auth-page">
       <div className="auth-page-card">
         <div className="auth-page-header">
-          <button className="auth-back" onClick={onBackHome}>
-            ← Back
-          </button>
+          <button className="auth-back" onClick={onBackHome}>← Back</button>
 
           <h1>{mode === "login" ? "Welcome back" : "Create your workspace"}</h1>
           <p>
