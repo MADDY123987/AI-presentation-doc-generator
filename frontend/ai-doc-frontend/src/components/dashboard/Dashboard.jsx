@@ -1,6 +1,6 @@
 // src/components/dashboard/Dashboard.jsx
 import React, { useEffect, useState } from "react";
-import "./Dashboard.css";
+import "./dashboard.css";
 
 const API_BASE = "http://127.0.0.1:8000/api/v1"; // adjust if needed
 const API_HOST = API_BASE.replace("/api/v1", ""); // e.g. http://127.0.0.1:8000
