@@ -150,12 +150,23 @@ function App() {
               <WordGenerator />
             </section>
           )}
-
           {activePage === "dashboard" && (
-            <section className="page page-narrow">
-              <Dashboard user={currentUser} />
-            </section>
-          )}
+  <section className="page page-narrow">
+    <Dashboard
+      user={currentUser}
+      onCreateProject={(kind) => {
+        if (kind === "ppt") {
+          setActivePage("ppt");
+        } else {
+          setActivePage("word");
+        }
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }}
+    />
+  </section>
+)}
+
+         
 
           {activePage === "login" && (
             <section className="page">

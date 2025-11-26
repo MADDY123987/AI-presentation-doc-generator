@@ -1,6 +1,5 @@
 // src/components/dashboard/Dashboard.jsx
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import "./dashboard.css";
 import { BASE_URL, AUTH_BASE_URL } from "../../config";
 
@@ -9,7 +8,7 @@ import { BASE_URL, AUTH_BASE_URL } from "../../config";
 const API_BASE = BASE_URL; // -> https://.../api/v1
 const API_HOST = AUTH_BASE_URL; // -> https://... (without /api/v1)
 
-function Dashboard({ user }) {
+function Dashboard({ user, onCreateProject }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [items, setItems] = useState(null);
@@ -17,8 +16,6 @@ function Dashboard({ user }) {
   const [modalContent, setModalContent] = useState({ title: "", body: "" });
   const [modalLoading, setModalLoading] = useState(false);
   const [showCreateMenu, setShowCreateMenu] = useState(false);
-
-  const navigate = useNavigate();
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem("authToken");
@@ -258,12 +255,8 @@ function Dashboard({ user }) {
 
   const handleCreate = (kind) => {
     setShowCreateMenu(false);
-    if (kind === "ppt") {
-      // 🔁 change this route to whatever you use for PptGenerator
-      navigate("/ppt-generator");
-    } else {
-      // 🔁 change this route to whatever you use for WordGenerator
-      navigate("/word-generator");
+    if (onCreateProject) {
+      onCreateProject(kind); // 👈 App decides ppt/word page
     }
   };
 
