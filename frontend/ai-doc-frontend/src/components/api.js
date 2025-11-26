@@ -1,8 +1,7 @@
-// src/api.js
+// frontend/ai-doc-frontend/src/components/api.js
 import axios from "axios";
-
-export const BASE_URL = "https://ai-doc-backend-hecs.onrender.com/api/v1";
+import { API_BASE_URL } from "../config";
 
 export const api = axios.create({
-  baseURL: BASE_URL,
+  baseURL: API_BASE_URL, // ✅ this already has /api/v1
 });

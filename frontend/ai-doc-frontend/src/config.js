@@ -1,4 +1,8 @@
-export const BASE_URL = "https://ai-doc-backend-hecs.onrender.com";
+// frontend/ai-doc-frontend/src/config.js
+
+export const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ||
+  "https://ai-doc-backend-hecs.onrender.com/api/v1";
 
 export const PPT_THEMES = {
   "Bright Orange Modern": {
