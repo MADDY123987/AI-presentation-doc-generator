@@ -1,111 +1,159 @@
-# AI PPT Generator
+🧠 AI Presentation & Document Generator
 
-## Overview
+Generate PowerPoint slides and Word-style documents instantly using AI.
+Fully customizable. Secure user dashboard. Modern UI. 🚀
 
-PPT Generator is a backend API service that generates PowerPoint presentations (PPTX) using AI (Google Gemini) or custom user content. It allows users to create, configure, and download presentations programmatically, supporting custom slide layouts, fonts, and colors.
+✨ Key Features
+🧠 AI-Generated Content
 
----
+Enter a topic + number of slides/pages
 
-## Features
-- **AI-powered slide generation**: Generate slide content automatically from a topic and slide count using Google Gemini.
-- **Custom content**: Provide your own slide content and structure.
-- **Configurable appearance**: Set fonts, font colors, and background colors for presentations.
-- **Downloadable PPTX**: Download the generated presentation as a .pptx file.
+Google Gemini automatically generates:
 
----
+Slide titles + bullet points
 
-## Architecture
-- **Backend**: FastAPI (Python)
-- **Database**: PostgreSQL (stores presentations and configurations)
-- **AI Integration**: Google Gemini for content generation
-- **PPTX Generation**: python-pptx
-- **Containerization**: Docker & Docker Compose
+Structured document sections
 
----
+Option to edit any auto-generated content before downloading
 
-## Setup & Installation
+📊 PPTX Generator
 
-### Prerequisites
-- Python 3.12+
-- Docker & Docker Compose (recommended)
-- Google Gemini API key
+Build .pptx files using python-pptx
 
-### Environment Variables
-Create a `.env` file in the `backend/` directory with the following:
-```
-DATABASE_URL=postgresql://service_user:service_password@db:5432/presentation_db
+Supports structured layouts:
+
+Title slide
+
+Bullet slide
+
+Multi-column layouts (templates)
+
+Customization:
+
+Fonts, font colors, and backgrounds
+
+Instant download from dashboard
+
+📄 Word-Style Document Generator
+
+Create structured academic or professional documents
+
+Configurable number of sections/pages
+
+Download/export via backend
+
+🔐 Secure Authentication + Dashboard
+
+JWT email/password login
+
+Per-user storage (each user sees only their own history)
+
+Google / GitHub OAuth available (optional toggle)
+
+Download past files anytime
+
+🏗️ Tech Stack
+Layer	Technology
+Frontend	React (Vite), JavaScript, CSS
+Backend	FastAPI, Uvicorn
+Auth	FastAPI-Users + JWT
+AI	Google Gemini API
+Database	SQLite (local / demo)
+File Generation	python-pptx, xlsxwriter
+Deployment	Render (backend), Vercel (frontend)
+🗂️ Project Structure
+ai-presentation-doc-generator/
+├── backend/
+│   ├── main.py
+│   ├── core/
+│   ├── models/
+│   ├── routers/
+│   ├── services/
+│   ├── storage/               # Generated docs + PPTs
+│   ├── ppt_generator.db       # SQLite database
+│   ├── requirements.txt
+│   └── .env (not committed)
+│
+└── frontend/ai-doc-frontend/
+    ├── src/
+    ├── package.json
+    ├── vite.config.js
+    └── .env (not committed)
+
+⚙️ Backend Setup
+📌 1. Requirements
+
+Python 3.12+
+
+Gemini API Key
+
+(Optional) PostgreSQL — SQLite by default for demo
+
+📌 2. Setup Virtual Environment & Install
+cd backend
+pip install -r requirements.txt
+
+📌 3. Environment Variables (backend/.env)
+DATABASE_URL=sqlite:///./ppt_generator.db
 GEMINI_API_KEY=your_gemini_api_key_here
-```
+SECRET=your_jwt_secret_here
+FRONTEND_URL=http://localhost:3000
 
-### Running with Docker Compose
-1. Build and start the services:
-   ```sh
-   docker-compose up --build
-   ```
-2. The API will be available at `http://localhost:8085`.
+📌 4. Run Backend
+uvicorn main:app --reload
 
-### Running Locally (without Docker)
-1. Install dependencies:
-   ```sh
-   cd backend
-   pip install -r requirements.txt
-   ```
-2. Ensure PostgreSQL is running and `DATABASE_URL` is set in `.env`.
-3. Run the API:
-   ```sh
-   python main.py
-   ```
 
----
+Backend URL:
 
-## API Endpoints
+http://127.0.0.1:8000
 
-### 1. Create a Presentation
-- **POST** `/api/v1/presentations/`
-- **Request Body:**
-  ```json
-  {
-    "topic": "Artificial Intelligence",
-    "num_slides": 5,
-    "custom_content": [  // Optional, overrides AI generation
-      {
-        "layout": "title",
-        "title": "Welcome to AI"
-      },
-      {
-        "layout": "bullet",
-        "title": "Key Points",
-        "bullets": ["History", "Applications", "Future"]
-      }
-    ]
-  }
-  ```
-- **Response:**
-  ```json
-  {
-    "presentation_id": 1,
-    "topic": "Artificial Intelligence",
-    "content": [...],
-    "configuration": null
-  }
-  ```
 
-### 2. Configure a Presentation
-- **POST** `/api/v1/presentations/{presentation_id}/configure`
-- **Request Body:**
-  ```json
-  {
-    "font_name": "Arial",
-    "font_color": "#000000",
-    "background_color": "#FFFFFF"
-  }
-  ```
-- **Response:** Same as above, with updated `configuration`.
+Docs:
 
-### 3. Get Presentation Details
-- **GET** `/api/v1/presentations/{presentation_id}`
-- **Response:** Presentation details (see above).
+http://127.0.0.1:8000/api/v1/docs
 
-### 4. Download PPTX
-- **GET** `/api/v1/presentations/{presentation_id}/download`
-- **Response:** Returns the generated `.pptx` file.
+🎨 Frontend Setup
+📌 Install & Run
+cd frontend/ai-doc-frontend
+npm install
+npm run dev
+
+
+Frontend URL:
+
+http://localhost:3000
+
+📌 .env configuration
+VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
+
+🔌 Core API Endpoints
+Method	Endpoint	Description
+POST	/api/v1/presentations/	Generate PPT (AI or custom)
+GET	/api/v1/presentations/{id}	View stored PPT metadata
+GET	/api/v1/presentations/{id}/download	Download PPTX
+POST	/api/v1/documents/	Generate Word-style document
+GET	/api/v1/documents/{id}/export	Download document
+GET	/api/v1/dashboard/items	Lists user’s PPTs + docs
+POST	/auth/jwt/login	Email/password login
+POST	/auth/register	Create account
+GET	/users/me	Get authenticated user info
+🚀 Deployment Guide (Simple)
+Backend on Render
+
+Build:
+
+pip install -r backend/requirements.txt
+
+
+Start:
+
+cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+
+Frontend on Vercel
+
+Configure:
+
+VITE_API_BASE_URL=https://<your-render-backend>/api/v1
+
+
+Deploy → Done ✨
