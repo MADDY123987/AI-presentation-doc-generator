@@ -4,62 +4,151 @@ Create professional PowerPoint presentations and Word-style documents—instantl
 
 Modern UI • Customizable • Secure Dashboard 🚀
 
-## Project Guide
+## ✨ Key Features
 
-### Title
-AI Presentation & Document Generator
+- **AI-Generated Content:**  
+  - Just enter your topic and number of slides/pages  
+  - Uses Google Gemini for intelligent structuring  
+  - Output (slide titles, bullet points, document sections) is editable before download
 
-### Description
-This project is designed to help users generate professional PowerPoint presentations and Word documents quickly and efficiently using AI technology. It provides an intuitive user interface that allows for customization to meet various presentation and document needs.
+- **PowerPoint (.pptx) Generator:**  
+  - Build PPTs with [python-pptx]  
+  - Multiple layouts: title, bullets, multi-column  
+  - Custom fonts, colors, backgrounds—themes  
+  - Instant download from your dashboard
 
-### Features
-- Instant generation of presentations and documents
-- User-friendly interface
-- Customizable templates
-- Secure dashboard for document management
+- **Word-Style Document Generator:**  
+  - Structured academic or professional docs  
+  - Configurable sections/pages  
+  - Download/export via backend
 
-### Tech Stack
-- Frontend: React.js
-- Backend: Node.js, Express
-- Database: MongoDB
-- AI Library: OpenAI API
+- **Authentication & Dashboard:**  
+  - Secure JWT email/password login  
+  - View/download your history anytime  
+  - Personal dashboard: only your files
 
-### Structure
-- `/client`: Contains the React frontend application.
-- `/server`: Contains the Node.js backend application.
-- `/models`: MongoDB models for data management.
+---
 
-### Local Setup
-1. Clone the repository:
-   `git clone https://github.com/MADDY123987/AI-presentation-doc-generator.git`
+## 🏗️ Tech Stack
 
-2. Navigate to the server directory:
-   `cd AI-presentation-doc-generator/server`
+| Layer     | Technology                            |
+|-----------|---------------------------------------|
+| Frontend  | React (Vite), JavaScript, CSS         |
+| Backend   | FastAPI, Uvicorn                      |
+| Auth      | FastAPI-Users + JWT                   |
+| AI        | Google Gemini API                     |
+| Database  | SQLite (demo default)                 |
+| Files     | python-pptx, xlsxwriter               |
+| Deploy    | Render (backend), Vercel (frontend)   |
 
-3. Install dependencies:
-   `npm install`
+---
 
-4. Navigate to the client directory:
-   `cd ../client`
+## 📂 Project Structure
 
-5. Install client dependencies:
-   `npm install`
+```
+ai-presentation-doc-generator/
+├── backend/
+│   ├── main.py
+│   ├── core/
+│   ├── models/
+│   ├── routers/
+│   ├── services/
+│   ├── storage/               # Generated docs + PPTs
+│   ├── ppt_generator.db       # SQLite database
+│   ├── requirements.txt
+│   └── .env                   # Backend config (NOT committed)
+│
+└── frontend/ai-doc-frontend/
+    ├── src/
+    ├── package.json
+    ├── vite.config.js
+    └── .env                   # Frontend config (NOT committed)
+```
 
-6. Start the server:
-   `npm start`
+---
 
-7. Start the client:
-   `npm start`
+## ⚙️ Quick Start: Local Setup
 
-### API Endpoints
-- `GET /api/presentations`: Fetch all presentations.
-- `POST /api/presentations`: Create a new presentation.
+> **Prerequisites:**  
+> - Python 3.12+  
+> - Node.js 18+ and npm  
+> - Google Gemini API key
 
-### Ready to Go
-Once the application is running, you can navigate to `http://localhost:3000` to access the dashboard. Here, you can create and manage your presentations and documents.
+### 1️⃣ Clone & Enter Project
 
-### Help
-For any issues or questions, please refer to the FAQ section in the documentation or reach out via GitHub Issues.
+```bash
+git clone https://github.com/<your-username>/ai-presentation-doc-generator.git
+cd ai-presentation-doc-generator
+```
 
-## Deployment Guide
-[Existing Deployment Guide content here...]
+### 2️⃣ Install & Run Backend (FastAPI)
+
+```bash
+cd backend
+python -m venv venv           # Create virtual environment
+source venv/bin/activate      # macOS / Linux
+venv\Scripts\activate         # Windows
+
+pip install -r requirements.txt    # Install dependencies
+```
+
+- **Config:** Create `backend/.env`
+    ```
+    DATABASE_URL=sqlite:///./ppt_generator.db
+    GEMINI_API_KEY=your_gemini_api_key_here
+    SECRET=your_jwt_secret_here
+    FRONTEND_URL=http://localhost:3000
+    ```
+
+- **Start Backend:**
+    ```bash
+    uvicorn main:app --reload
+    ```
+    [http://127.0.0.1:8000](http://127.0.0.1:8000) (Swagger: `/api/v1/docs`)
+
+---
+
+### 3️⃣ Install & Run Frontend (React + Vite)
+
+```bash
+cd ../frontend/ai-doc-frontend
+npm install
+```
+
+- **Config:** Create `frontend/ai-doc-frontend/.env`
+    ```
+    VITE_API_BASE_URL=http://127.0.0.1:8000/api/v1
+    ```
+
+- **Start Frontend:**
+    ```bash
+    npm run dev
+    ```
+    Visit: [http://localhost:3000](http://localhost:3000)
+
+---
+
+## 🔌 Core API Endpoints
+
+| Method | Endpoint                              | Description                      |
+|--------|---------------------------------------|----------------------------------|
+| POST   | `/api/v1/presentations/`              | Generate PPT (AI/custom input)   |
+| GET    | `/api/v1/presentations/{id}`          | Get PPT metadata                 |
+| GET    | `/api/v1/presentations/{id}/download` | Download `.pptx` file            |
+| POST   | `/api/v1/documents/`                  | Generate Word-style document     |
+| GET    | `/api/v1/documents/{id}/export`       | Download document                |
+| GET    | `/api/v1/dashboard/items`             | List your PPTs & docs            |
+| POST   | `/auth/jwt/login`                     | Email/password login             |
+| POST   | `/auth/register`                      | Create new user account          |
+| GET    | `/users/me`                           | Get your profile                 |
+
+---
+
+## 🚀 Ready to Go!
+
+Once both backend and frontend are running, use the dashboard at [http://localhost:3000](http://localhost:3000) to generate, customize, and download your AI-powered documents and presentations.
+
+---
+
+**Need help?**  
+Check the Swagger docs: [http://127.0.0.1:8000/api/v1/docs](http://127.0.0.1:8000/api/v1/docs)
