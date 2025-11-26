@@ -1,7 +1,11 @@
+// src/components/auth/AuthPage.jsx
 import React, { useState } from "react";
 import "./AuthPage.css";
+import { BASE_URL } from "../../config";
 
-const API_BASE = "http://127.0.0.1:8000"; // Backend URL
+// Use deployed backend (Render), not localhost
+// Example: https://ai-doc-backend-hecs.onrender.com
+const API_BASE = BASE_URL;
 
 function AuthPage({ onBackHome, onLogin }) {
   const [mode, setMode] = useState("login");
@@ -16,10 +20,11 @@ function AuthPage({ onBackHome, onLogin }) {
 
     try {
       if (mode === "register") {
+        // ---------- REGISTER ----------
         const res = await fetch(`${API_BASE}/auth/register`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email, password }),
+          body: JSON.stringify({ email, password }), // backend ignores name
         });
 
         const data = await res.json();
@@ -28,6 +33,7 @@ function AuthPage({ onBackHome, onLogin }) {
         alert("Registered! Now login.");
         setMode("login");
       } else {
+        // ---------- LOGIN ----------
         const form = new URLSearchParams();
         form.append("username", email);
         form.append("password", password);
@@ -44,9 +50,11 @@ function AuthPage({ onBackHome, onLogin }) {
         const token = data.access_token;
         if (!token) throw new Error("No access token received");
 
+        // Save token + email
         localStorage.setItem("authToken", token);
         localStorage.setItem("authEmail", email);
 
+        // ---------- Fetch current user ----------
         const meRes = await fetch(`${API_BASE}/users/me`, {
           headers: { Authorization: `Bearer ${token}` },
         });
@@ -61,7 +69,8 @@ function AuthPage({ onBackHome, onLogin }) {
         if (onBackHome) onBackHome();
       }
     } catch (err) {
-      alert(err.message);
+      console.error("Auth error:", err);
+      alert(err.message || "Unknown error");
     } finally {
       setLoading(false);
     }
