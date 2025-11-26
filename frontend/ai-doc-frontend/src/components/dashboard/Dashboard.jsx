@@ -1,11 +1,14 @@
 // src/components/dashboard/Dashboard.jsx
 import React, { useEffect, useState } from "react";
 import "./dashboard.css";
-import { BASE_URL } from "../../config";
+import { BASE_URL, AUTH_BASE_URL } from "../../config";
+
 
 // Use Render backend everywhere (no localhost)
-const API_BASE = `${BASE_URL}/api/v1`;
-const API_HOST = BASE_URL;
+// BASE_URL already includes /api/v1
+const API_BASE = BASE_URL;          // -> https://.../api/v1
+const API_HOST = AUTH_BASE_URL;     // -> https://... (without /api/v1)
+
 
 function Dashboard({ user }) {
   const [loading, setLoading] = useState(true);

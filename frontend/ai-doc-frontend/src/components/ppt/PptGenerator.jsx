@@ -5,6 +5,7 @@ import { BASE_URL, PPT_THEMES } from "../../config";
 import SlideEditor from "./SlideEditor";
 import "./ppt.css";
 
+console.log("PPT_THEMES keys =", Object.keys(PPT_THEMES));
 // NOTE: using the uploaded local path you provided.
 // The dev tooling / backend will transform this to a browser-accessible URL when needed.
 const SAMPLE_IMAGE_PATH = "/mnt/data/cf6a33ff-d0bc-4e56-89d7-6a9513516d8a.png";
@@ -397,58 +398,72 @@ function PptGenerator() {
             </div>
           </div>
 
-          {/* theme picker */}
-          <div className="card ppt-step-card">
-            <h3>3️⃣ Pick PPT Design Theme</h3>
-            <p className="card-caption">Apply one of your predefined themes. Backend will handle colors, fonts and layout tweaks.</p>
-            <div className="field-grid" style={{ alignItems: "flex-start" }}>
-              {/* VISUAL THEME GRID */}
-              <div className="theme-picker-grid" role="list">
-                {Object.keys(PPT_THEMES).map((name) => {
-                  const meta = PPT_THEMES[name];
-                  return (
-                    <button
-                      key={name}
-                      type="button"
-                      className={`theme-thumb ${themeName === name ? "selected" : ""}`}
-                      onClick={() => setThemeName(name)}
-                      aria-pressed={themeName === name}
-                      title={name}
-                    >
-                      <img
-                        src={renderThumbSrc(meta)}
-                        alt={`${name} preview`}
-                        onError={onThumbError}
-                        aria-hidden="false"
-                      />
-                      <div className="theme-thumb-label">{name}</div>
-                    </button>
-                  );
-                })}
-              </div>
+        {/* theme picker */}
+<div className="card ppt-step-card">
+  <h3>3️⃣ Pick PPT Design Theme</h3>
+  <p className="card-caption">
+    Apply one of your predefined themes. Backend will handle colors, fonts and layout tweaks.
+  </p>
 
-              {/* larger preview */}
-              <div style={{ marginTop: 12 }}>
-                <div style={{ fontSize: 13, color: "#cbd5e1", marginBottom: 6 }}>Selected theme preview</div>
-                <div className="theme-preview-large">
-                  <img
-                    src={(PPT_THEMES[themeName] && (PPT_THEMES[themeName].preview || PPT_THEMES[themeName].thumb)) || SAMPLE_IMAGE_PATH}
-                    alt="Selected theme preview"
-                    onError={onThumbError}
-                  />
-                </div>
-              </div>
-            </div>
+  {/* 🔍 DEBUG: show how many themes are loaded */}
+  <div style={{ color: "#cbd5e1", fontSize: 12, marginBottom: 4 }}>
+    Loaded themes: {Object.keys(PPT_THEMES).length}
+  </div>
 
-            <button
-              className="secondary-action"
-              onClick={handleApplyTheme}
-              disabled={loading || !presentationId}
-              title={presentationId ? "Apply selected theme" : "Generate presentation first"}
-            >
-              {loading ? "Applying..." : "Apply Design Theme"}
-            </button>
-          </div>
+  <div className="field-grid" style={{ alignItems: "flex-start" }}>
+    {/* VISUAL THEME GRID */}
+    <div className="theme-picker-grid" role="list">
+      {Object.keys(PPT_THEMES).map((name) => {
+        const meta = PPT_THEMES[name];
+        return (
+          <button
+            key={name}
+            type="button"
+            className={`theme-thumb ${themeName === name ? "selected" : ""}`}
+            onClick={() => setThemeName(name)}
+            aria-pressed={themeName === name}
+            title={name}
+          >
+            <img
+              src={renderThumbSrc(meta)}
+              alt={`${name} preview`}
+              onError={onThumbError}
+              aria-hidden="false"
+            />
+            <div className="theme-thumb-label">{name}</div>
+          </button>
+        );
+      })}
+    </div>
+
+    {/* larger preview */}
+    <div style={{ marginTop: 12 }}>
+      <div style={{ fontSize: 13, color: "#cbd5e1", marginBottom: 6 }}>
+        Selected theme preview
+      </div>
+      <div className="theme-preview-large">
+        <img
+          src={
+            (PPT_THEMES[themeName] &&
+              (PPT_THEMES[themeName].preview || PPT_THEMES[themeName].thumb)) ||
+            SAMPLE_IMAGE_PATH
+          }
+          alt="Selected theme preview"
+          onError={onThumbError}
+        />
+      </div>
+    </div>
+  </div>
+
+  <button
+    className="secondary-action"
+    onClick={handleApplyTheme}
+    disabled={loading || !presentationId}
+    title={presentationId ? "Apply selected theme" : "Generate presentation first"}
+  >
+    {loading ? "Applying..." : "Apply Design Theme"}
+  </button>
+</div>
 
           {/* export */}
           <div className="card ppt-step-card">
