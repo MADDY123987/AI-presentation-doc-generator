@@ -13,13 +13,12 @@
   border: 0 !important;
 }
 
-/* --- Slide card: force 16:9 rectangle --- */
+/* --- Slide card: structural layout only (visuals in ppt.css) --- */
 .slide-card {
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
-  aspect-ratio: 16 / 9;          /* 🔴 fixed PPT-like shape */
   overflow: hidden;
 }
 
@@ -73,10 +72,10 @@
   gap: 6px;
   color: #d1d5db;
   font-size: 0.8rem;
-  overflow: auto;              /* 🔵 scroll when text is long */
+  overflow: auto; /* scroll when text is long */
 }
 
-/* Bullet editor: present each bullet as a block (div) for predictable editing */
+/* Bullet editor: each bullet as block */
 .slide-bullet-editor.editable {
   min-height: 70px;
   padding: 8px;
@@ -89,7 +88,6 @@
   word-break: break-word;
 }
 
-/* Each bullet line visually separated */
 .bullet-line {
   padding: 2px 0;
 }
@@ -148,7 +146,7 @@
   min-height: 34px;
 }
 
-/* Hide fallback controls visually but keep accessible for screen readers/programmatic */
+/* Hide fallback controls visually but keep accessible */
 .slide-hidden-controls {
   display: none;
 }
@@ -159,7 +157,7 @@
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.08);
 }
 
-/* --- Compact footer: feedback + save --- */
+/* --- Ultra-compact footer: feedback + save --- */
 .slide-card-footer {
   margin-top: 4px;
   display: flex;
@@ -170,7 +168,6 @@
 }
 
 /* left side: like/dislike + comment */
-
 
 .feedback-buttons {
   display: flex;
@@ -194,7 +191,7 @@
   align-items: center;
   gap: 0.25rem;
   transition: background 0.15s ease, border-color 0.15s ease,
-              box-shadow 0.15s ease, transform 0.1s ease;
+    box-shadow 0.15s ease, transform 0.1s ease;
 }
 
 .feedback-btn:hover {
@@ -218,14 +215,14 @@
   box-shadow: none;
   transform: none;
 }
-/* === Ultra-compact feedback layout === */
 
+/* feedback container */
 .slide-feedback-row {
-  flex: 0;                            /* <- stops it from stretching tall */
+  flex: 0;
   display: flex;
   flex-direction: column;
-  gap: 2px;                           /* <- reduce spacing further */
-  padding: 4px 6px;                   /* <- tighter padding */
+  gap: 2px;
+  padding: 4px 6px;
   border-radius: 6px;
   background: rgba(15, 23, 42, 0.7);
   border: 1px solid rgba(148, 163, 184, 0.25);
@@ -234,12 +231,12 @@
 /* smaller comment box */
 .feedback-comment-input {
   width: 100%;
-  min-height: 32px;                   /* <- smaller */
-  max-height: 50px;                   /* <- prevents growing */
-  padding: 2px 4px;                   /* <- reduced padding */
-  border-radius: 6px;                 /* <- smaller radius */
+  min-height: 32px;
+  max-height: 50px;
+  padding: 2px 4px;
+  border-radius: 6px;
   resize: vertical;
-  font-size: 0.70rem;                 /* <- text smaller */
+  font-size: 0.7rem;
   font-family: inherit;
 
   background: rgba(15, 23, 42, 0.95);
