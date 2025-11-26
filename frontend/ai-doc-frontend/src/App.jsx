@@ -1,6 +1,5 @@
 // src/App.jsx
 import React, { useState, useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import "./App.css";
 import "./word.css";
 
@@ -12,19 +11,32 @@ import WordGenerator from "./components/word/WordGenerator.jsx";
 import AuthPage from "./components/auth/AuthPage.jsx";
 import Dashboard from "./components/dashboard/Dashboard.jsx";
 
-import { BASE_URL } from "./config"; // 🔥 uses Render backend
-
 function App() {
+  // which page is visible
+  const [activePage, setActivePage] = useState("home");
+  // logged-in user
   const [currentUser, setCurrentUser] = useState(null);
 
-  // Load user from storage at startup
+  // restore user from localStorage on first load
   useEffect(() => {
     const storedUser = localStorage.getItem("authUser");
-    if (storedUser) setCurrentUser(JSON.parse(storedUser));
+    if (storedUser) {
+      try {
+        setCurrentUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse authUser from localStorage", e);
+      }
+    }
   }, []);
+
+  const changePage = (page) => {
+    setActivePage(page);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleLogin = (user) => {
     setCurrentUser(user);
+    changePage("home");
   };
 
   const handleLogout = () => {
@@ -32,72 +44,67 @@ function App() {
     localStorage.removeItem("authEmail");
     localStorage.removeItem("authUser");
     setCurrentUser(null);
+    changePage("home");
   };
 
-  // 🔒 Protected Route
-  const ProtectedRoute = ({ children }) =>
-    currentUser ? children : <Navigate to="/login" replace />;
+  // dashboard “+ New project” -> go to PPT or Word
+  const handleCreateProject = (kind) => {
+    if (kind === "ppt") changePage("ppt");
+    else changePage("word");
+  };
 
   return (
-    <BrowserRouter>
-      <div className="app">
-        <Navbar user={currentUser} onLogout={handleLogout} />
+    <div className="app">
+      <Navbar
+        activePage={activePage}
+        onChangePage={changePage}
+        user={currentUser}
+        onLogout={handleLogout}
+      />
 
-        <main className="main">
-          <div className="page-container">
-            <Routes>
-              <Route path="/" element={<Home />} />
+      <main className="main">
+        <div className="page-container">
+          {activePage === "home" && (
+            <Home
+              onStartPpt={() => changePage("ppt")}
+              onStartWord={() => changePage("word")}
+            />
+          )}
 
-              {/* PPT Generator */}
-              <Route
-                path="/ppt"
-                element={
-                  <ProtectedRoute>
-                    <PptGenerator />
-                  </ProtectedRoute>
-                }
+          {activePage === "ppt" && (
+            <section className="page page-narrow">
+              <PptGenerator />
+            </section>
+          )}
+
+          {activePage === "word" && (
+            <section className="page page-narrow">
+              <WordGenerator />
+            </section>
+          )}
+
+          {activePage === "dashboard" && (
+            <section className="page page-narrow">
+              <Dashboard
+                user={currentUser}
+                onCreateProject={handleCreateProject}
               />
+            </section>
+          )}
 
-              {/* DOCX Generator */}
-              <Route
-                path="/word"
-                element={
-                  <ProtectedRoute>
-                    <WordGenerator />
-                  </ProtectedRoute>
-                }
+          {activePage === "login" && (
+            <section className="page">
+              <AuthPage
+                onBackHome={() => changePage("home")}
+                onLogin={handleLogin}
               />
+            </section>
+          )}
+        </div>
+      </main>
 
-              {/* Dashboard */}
-              <Route
-                path="/dashboard"
-                element={
-                  <ProtectedRoute>
-                    <Dashboard
-                      user={currentUser}
-                      onCreateProject={(kind) =>
-                        window.location.href = kind === "ppt" ? "/ppt" : "/word"
-                      }
-                    />
-                  </ProtectedRoute>
-                }
-              />
-
-              {/* Login */}
-              <Route
-                path="/login"
-                element={<AuthPage onLogin={handleLogin} />}
-              />
-
-              {/* default → Home */}
-              <Route path="*" element={<Navigate to="/" />} />
-            </Routes>
-          </div>
-        </main>
-
-        <Footer />
-      </div>
-    </BrowserRouter>
+      <Footer />
+    </div>
   );
 }
 
