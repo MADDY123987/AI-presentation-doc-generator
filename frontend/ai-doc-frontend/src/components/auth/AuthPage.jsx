@@ -25,7 +25,7 @@ function AuthPage({ onBackHome, onLogin }) {
         const data = await res.json();
         if (!res.ok) throw new Error(data.detail || "Registration failed");
 
-        alert("Registered successfully! Now log in.");
+        alert("Registered! Now login.");
         setMode("login");
       } else {
         const form = new URLSearchParams();
@@ -57,39 +57,12 @@ function AuthPage({ onBackHome, onLogin }) {
         localStorage.setItem("authUser", JSON.stringify(me));
         if (onLogin) onLogin(me);
 
-        alert("Logged in successfully!");
+        alert("Logged in!");
         if (onBackHome) onBackHome();
       }
     } catch (err) {
-      console.error(err);
       alert(err.message);
     } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleOAuth = async (provider) => {
-    try {
-      setLoading(true);
-
-      // remember provider for /oauth-complete
-      sessionStorage.setItem("oauth_provider", provider);
-
-      const res = await fetch(`${API_BASE}/auth/${provider}/authorize`);
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.detail || "Failed to start OAuth");
-      }
-
-      if (!data.authorization_url) {
-        throw new Error("No authorization_url from backend");
-      }
-
-      window.location.href = data.authorization_url;
-    } catch (err) {
-      console.error(err);
-      alert(err.message);
       setLoading(false);
     }
   };
@@ -112,13 +85,17 @@ function AuthPage({ onBackHome, onLogin }) {
 
         <div className="auth-page-tabs">
           <button
-            className={mode === "login" ? "auth-page-tab active" : "auth-page-tab"}
+            className={
+              mode === "login" ? "auth-page-tab active" : "auth-page-tab"
+            }
             onClick={() => setMode("login")}
           >
             Login
           </button>
           <button
-            className={mode === "register" ? "auth-page-tab active" : "auth-page-tab"}
+            className={
+              mode === "register" ? "auth-page-tab active" : "auth-page-tab"
+            }
             onClick={() => setMode("register")}
           >
             Register
@@ -171,40 +148,6 @@ function AuthPage({ onBackHome, onLogin }) {
               : "Create account"}
           </button>
         </form>
-
-        <div className="auth-divider">
-          <span>OR</span>
-        </div>
-
-        <div className="oauth-buttons">
-          <button
-            className="oauth-btn github"
-            disabled={loading}
-            onClick={() => handleOAuth("github")}
-          >
-            <img
-              src="https://github.githubassets.com/images/modules/logos_page/GitHub-Mark.png"
-              alt="GitHub"
-              width="18"
-              height="18"
-            />
-            GitHub Login
-          </button>
-
-          <button
-            className="oauth-btn google"
-            disabled={loading}
-            onClick={() => handleOAuth("google")}
-          >
-            <img
-              src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg"
-              alt="Google"
-              width="18"
-              height="18"
-            />
-            Google Login
-          </button>
-        </div>
       </div>
     </div>
   );

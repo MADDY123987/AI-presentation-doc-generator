@@ -46,15 +46,17 @@ function Home({ onStartPpt, onStartWord }) {
           <p className="hero-small">No credit card required</p>
         </div>
 
-        {/* Right side: hero video / GIF placeholder */}
+        {/* Right side: hero video */}
         <div className="hero-demo-shell">
           <div className="hero-demo-box">
-            {/* Replace this div with an actual <video> / <iframe> later */}
-            <span className="hero-demo-label">🧪 Live Demo (Coming Soon)</span>
-            <p>
-              This area will show a short video or GIF of your PPT + DOC
-              workflow: topic → AI → preview → download.
-            </p>
+            <video
+              src="/themes/editvideo.mp4"
+              autoPlay
+              loop
+              muted
+              controls
+              className="hero-video"
+            />
           </div>
         </div>
       </div>
@@ -158,12 +160,13 @@ function Home({ onStartPpt, onStartWord }) {
           </p>
         </div>
 
-        {/* Placeholder block for future screenshot / illustration */}
+        {/* Screenshot / illustration */}
         <div className="idea-visual">
-          {/* TODO: drop in an image of your PPT editor / slide preview */}
-          <div className="image-placeholder">
-            PPT + DOC workflow image goes here
-          </div>
+          <img
+            src="/themes/Screenshot 2025-11-26 072438.png"
+            alt="PPT + DOC workflow preview"
+            className="idea-image"
+          />
         </div>
       </section>
 
@@ -171,10 +174,11 @@ function Home({ onStartPpt, onStartWord }) {
       <section className="creative-section reveal">
         {/* Left image slot */}
         <div className="creative-visual">
-          {/* TODO: image showing templates / color palette */}
-          <div className="image-placeholder">
-            Template &amp; color-palette mockup (image slot)
-          </div>
+          <img
+            src="/themes/Screenshot 2025-11-26 072403.png"
+            alt="Template and color palette mockup"
+            className="creative-image"
+          />
         </div>
 
         {/* Right text */}
@@ -199,11 +203,13 @@ function Home({ onStartPpt, onStartWord }) {
           </p>
         </div>
 
-        {/* Brand kit visual slot */}
+        {/* Brand kit visual */}
         <div className="brand-visual">
-          <div className="image-placeholder">
-            Brand kit / assets panel (image slot)
-          </div>
+          <img
+            src="/themes/Screenshot 2025-11-26 072423.png"
+            alt="Brand kit and assets panel"
+            className="brand-image"
+          />
         </div>
       </section>
 
@@ -240,16 +246,13 @@ function Home({ onStartPpt, onStartWord }) {
           </div>
         </div>
 
-        {/* Wide slot for FINAL PROJECT VIDEO */}
+        {/* FINAL PROJECT VIDEO */}
         <div className="final-video-shell">
-          {/* TODO: replace with real <video> / <iframe> when ready */}
-          <div className="final-video-placeholder">
-            🎥 Final Project Walkthrough (video placeholder)
-            <p>
-              This section is reserved for your demo video showing the complete
-              FastAPI + Gemini + React workflow.
-            </p>
-          </div>
+          <video
+            src="/themes/editvideo.mp4"
+            controls
+            className="final-video"
+          />
         </div>
       </section>
 

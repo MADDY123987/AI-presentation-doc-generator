@@ -338,6 +338,34 @@
   line-height: 1.6;
 }
 
+/* ============ MEDIA ELEMENTS (IMAGES & VIDEOS) ============ */
+
+/* Hero video on the right */
+.hero-video {
+  width: 100%;
+  display: block;
+  margin-top: 8px;
+  border-radius: 16px;
+  border: 1px solid #1f2937;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+  max-height: 360px;       /* control height */
+  object-fit: cover;       /* crop nicely */
+}
+
+/* Section screenshots */
+.idea-image,
+.creative-image,
+.brand-image {
+  width: 100%;
+  display: block;
+  border-radius: 20px;
+  border: 1px solid #1f2937;
+  background: radial-gradient(circle at top left, #111827, #020617 60%);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+  max-height: 360px;
+  object-fit: cover;
+}
+
 /* ============ SIMPLE · FAST · FUN + VIDEO ============ */
 
 .simple-fast-section {
@@ -378,12 +406,17 @@
   color: #cbd5f5;
 }
 
-/* final video placeholder */
+/* final video container + video */
 
 .final-video-shell {
   margin-top: 8px;
+  max-width: 960px;        /* keep it centered and not full ultra-wide */
+  width: 100%;
+  margin-left: auto;
+  margin-right: auto;
 }
 
+/* old placeholder (not used now but you can keep it) */
 .final-video-placeholder {
   border-radius: 20px;
   border: 1px dashed #4b5563;
@@ -398,6 +431,17 @@
   color: #9ca3af;
   text-align: center;
   padding: 18px;
+}
+
+/* actual <video> */
+.final-video {
+  width: 100%;
+  display: block;
+  border-radius: 20px;
+  border: 1px solid #1f2937;
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+  max-height: 420px;
+  object-fit: cover;
 }
 
 /* ============ DEMO SECTION (OLDER PPT PREVIEW) ============ */
@@ -568,6 +612,15 @@
   .testimonial-card {
     max-width: 100%;
   }
+
+  /* shrink media heights on mobile */
+  .hero-video,
+  .idea-image,
+  .creative-image,
+  .brand-image,
+  .final-video {
+    max-height: 260px;
+  }
 }
 
 /* ============ ULTRA-WIDE SCREENS (FULLER LOOK) ============ */
@@ -575,7 +628,6 @@
 @media (min-width: 1440px) {
   .home {
     padding: 64px 72px 96px;          /* more breathing room */
-    gap: 72px;
   }
 
   .hero-main h1 {

@@ -3,21 +3,6 @@ import axios from "axios";
 import { BASE_URL } from "../../config";
 import "./slide-editor.css";
 
-/**
- * SlideEditor — direct inline preview editing
- *
- * - Edit title / bullets / two-column / image caption directly inside the preview.
- * - Changes update local state and call onLocalChange(index, updatedSlide) (if provided).
- * - If presentationId is provided, debounced autosave calls PUT /presentations/{id}/slides/{index}.
- *
- * Props:
- *  - index (number)
- *  - slide (object) { layout, title, bullets, left, right, image_url, caption }
- *  - presentationId (optional) — autosave target
- *  - onLocalChange(index, mergedSlide) (optional) — parent sync
- *  - onSave(idx, payload) (optional) — manual save fallback
- */
-
 const DEBOUNCE_MS = 800;
 const SAMPLE_IMAGE = "/mnt/data/cf6a33ff-d0bc-4e56-89d7-6a9513516d8a.png";
 
@@ -29,11 +14,18 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
   const [left, setLeft] = useState(slide.left || "");
   const [right, setRight] = useState(slide.right || "");
   const [imageUrl, setImageUrl] = useState(slide.image_url || SAMPLE_IMAGE);
-  const [caption, setCaption] = useState(slide.caption || slide.description || "");
+  const [caption, setCaption] = useState(
+    slide.caption || slide.description || ""
+  );
   const [saving, setSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState("Saved");
 
-  // debounce timer ref
+  // 👇 NEW: per-slide feedback state
+  const [reaction, setReaction] = useState(slide.reaction || null); // "like" | "dislike" | null
+  const [comment, setComment] = useState(slide.comment || "");
+  const [feedbackSaving, setFeedbackSaving] = useState(false);
+  const [feedbackStatus, setFeedbackStatus] = useState("Feedback not saved yet");
+
   const timerRef = useRef(null);
   const mounted = useRef(true);
 
@@ -53,6 +45,10 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
     setRight(slide.right || "");
     setImageUrl(slide.image_url || SAMPLE_IMAGE);
     setCaption(slide.caption || slide.description || "");
+
+    // 👇 sync feedback fields if backend sends them
+    setReaction(slide.reaction || null);
+    setComment(slide.comment || "");
   }, [slide]);
 
   // Build minimal payload matching SlideUpdate schema
@@ -75,7 +71,9 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
       if (right !== (slide.right || "")) payload.right = right;
     } else if (layout === "image") {
       if (imageUrl !== (slide.image_url || "")) payload.image_url = imageUrl;
-      if (caption !== (slide.caption || slide.description || "")) payload.caption = caption;
+      if (caption !== (slide.caption || slide.description || "")) {
+        payload.caption = caption;
+      }
     } else {
       // custom/title: title handled above
     }
@@ -124,7 +122,7 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
     const payload = buildPayload();
     notifyLocal(payload);
 
-    if (!presentationId) return; // no backend; parent handles deck save
+    if (!presentationId) return;
 
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => {
@@ -133,7 +131,6 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
     }, DEBOUNCE_MS);
   };
 
-  // Manual save (via Save button) calls provided onSave or saves to backend directly
   const handleManualSave = async () => {
     const payload = buildPayload();
     notifyLocal(payload);
@@ -142,54 +139,110 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
       onSave(index, payload);
       return;
     }
-    // fallback: write directly
     await saveToBackend(payload);
+  };
+
+  /* --- NEW: feedback submit helper --- */
+  const submitFeedback = async (nextReaction = reaction, nextComment = comment) => {
+    // if no backend id, just keep it local
+    if (!presentationId) {
+      setFeedbackStatus("Feedback stored locally");
+      return;
+    }
+
+    try {
+      setFeedbackSaving(true);
+      setFeedbackStatus("Saving feedback…");
+
+      const token = localStorage.getItem("authToken");
+      const payload = {
+        reaction: nextReaction, // "like" | "dislike" | null
+        comment: nextComment,
+      };
+
+      await axios.post(
+        `${BASE_URL}/presentations/${presentationId}/slides/${index}/feedback`,
+        payload,
+        {
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
+
+      if (mounted.current) {
+        setFeedbackSaving(false);
+        setFeedbackStatus("Feedback saved");
+      }
+
+      // reflect in parent if needed
+      if (onLocalChange) {
+        onLocalChange(index, {
+          ...slide,
+          reaction: nextReaction,
+          comment: nextComment,
+        });
+      }
+    } catch (err) {
+      console.error("Saving feedback failed:", err);
+      if (mounted.current) {
+        setFeedbackSaving(false);
+        setFeedbackStatus("Error saving feedback");
+      }
+    }
+  };
+
+  const handleReactionClick = (type) => {
+    // toggle behavior: click again to clear
+    const next =
+      reaction === type
+        ? null
+        : type; // either "like", "dislike", or null
+
+    setReaction(next);
+    submitFeedback(next, comment);
+  };
+
+  const handleCommentBlur = () => {
+    // save comment when user leaves the textarea
+    submitFeedback(reaction, comment);
   };
 
   /* --- Handlers when editing the preview (contentEditable elements) --- */
 
-  // Title edit inside preview
   const onTitleInput = (e) => {
-    const v = e.currentTarget.innerText.replace(/\u00A0/g, " "); // clear NBSP
+    const v = e.currentTarget.innerText.replace(/\u00A0/g, " ");
     setTitle(v);
     triggerSaveDebounced();
   };
 
-  // Bullets preview is a contentEditable div where each newline / block becomes a bullet.
   const onBulletsInput = (e) => {
-    // normalize: split by line breaks
     const text = e.currentTarget.innerText.replace(/\u00A0/g, " ");
-    // Some browsers yield lines with \n, some with separate <div>, innerText normalizes
     setBulletsText(text);
     triggerSaveDebounced();
   };
 
-  // Two-column inline edits
   const onLeftInput = (e) => {
     const v = e.currentTarget.innerText.replace(/\u00A0/g, " ");
     setLeft(v);
     triggerSaveDebounced();
   };
+
   const onRightInput = (e) => {
     const v = e.currentTarget.innerText.replace(/\u00A0/g, " ");
     setRight(v);
     triggerSaveDebounced();
   };
 
-  // Image caption edit
   const onCaptionInput = (e) => {
     const v = e.currentTarget.innerText.replace(/\u00A0/g, " ");
     setCaption(v);
     triggerSaveDebounced();
   };
 
-  // Image URL fallback input (hidden visually) kept for accessibility
   const onImageUrlChange = (v) => {
     setImageUrl(v);
     triggerSaveDebounced();
   };
 
-  // Render bullets array for preview use
   const bulletsPreview = bulletsText
     .split("\n")
     .map((b) => b.trim())
@@ -213,7 +266,6 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
         <span className="slide-layout-pill">{layoutLabel}</span>
       </div>
 
-      {/* Title edit moved into preview — top input intentionally hidden to keep UI clean */}
       <input
         className="slide-title-input visually-hidden"
         type="text"
@@ -225,9 +277,10 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
         aria-hidden="true"
       />
 
-      {/* --- PREVIEW (now editable) --- */}
-      <div className="slide-preview slide-preview-editable" aria-label={`Slide ${index + 1} editor`}>
-        {/* Editable title in the preview */}
+      <div
+        className="slide-preview slide-preview-editable"
+        aria-label={`Slide ${index + 1} editor`}
+      >
         <div
           className="slide-preview-title editable"
           contentEditable
@@ -251,7 +304,6 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
             >
               {bulletsPreview.length > 0 ? (
                 bulletsPreview.map((b, i) => (
-                  // Put each bullet on its own line (div) for better editing behaviour
                   <div key={i} className="bullet-line">
                     {b}
                   </div>
@@ -296,7 +348,11 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
             <div className="slide-image-layout">
               <div className="slide-preview-image-box">
                 {imageUrl ? (
-                  <img src={imageUrl} alt={`slide-${index}-img`} className="slide-preview-image" />
+                  <img
+                    src={imageUrl}
+                    alt={`slide-${index}-img`}
+                    className="slide-preview-image"
+                  />
                 ) : (
                   <span>Image placeholder</span>
                 )}
@@ -321,7 +377,6 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
               contentEditable
               suppressContentEditableWarning
               onInput={(e) => {
-                // update title if title content changes for title layout
                 setTitle(e.currentTarget.innerText);
                 triggerSaveDebounced();
               }}
@@ -334,7 +389,6 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
         </div>
       </div>
 
-      {/* Hidden fallback controls (kept for accessibility & programmatic editing) */}
       <div className="slide-hidden-controls" aria-hidden="true">
         <label>
           <span>Bullets (fallback)</span>
@@ -379,19 +433,63 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
         </label>
       </div>
 
-      {/* Footer: manual Save + status */}
+      {/* 🔻 FOOTER: feedback + save slide */}
       <div className="slide-card-footer">
-        <div className="save-status" aria-hidden>
-          {statusMsg}
+        <div className="slide-feedback-row">
+          <div className="feedback-buttons">
+            <button
+              type="button"
+              className={
+                reaction === "like"
+                  ? "feedback-btn active"
+                  : "feedback-btn"
+              }
+              onClick={() => handleReactionClick("like")}
+              disabled={feedbackSaving}
+            >
+              👍 Like
+            </button>
+            <button
+              type="button"
+              className={
+                reaction === "dislike"
+                  ? "feedback-btn active"
+                  : "feedback-btn"
+              }
+              onClick={() => handleReactionClick("dislike")}
+              disabled={feedbackSaving}
+            >
+              👎 Dislike
+            </button>
+
+            <span className="feedback-status">
+              {feedbackStatus}
+            </span>
+          </div>
+
+          <textarea
+            className="feedback-comment-input"
+            placeholder="Add a comment or note for this slide (saved automatically)…"
+            value={comment}
+            onChange={(e) => setComment(e.target.value)}
+            onBlur={handleCommentBlur}
+            rows={2}
+          />
         </div>
-        <button
-          className="slide-save-btn"
-          onClick={handleManualSave}
-          disabled={saving}
-          title="Force save now"
-        >
-          💾 Save Slide
-        </button>
+
+        <div className="slide-footer-actions">
+          <div className="save-status" aria-hidden>
+            {statusMsg}
+          </div>
+          <button
+            className="slide-save-btn"
+            onClick={handleManualSave}
+            disabled={saving}
+            title="Force save now"
+          >
+            💾 Save Slide
+          </button>
+        </div>
       </div>
     </div>
   );

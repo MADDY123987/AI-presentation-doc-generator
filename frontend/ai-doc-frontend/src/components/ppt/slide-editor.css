@@ -162,3 +162,202 @@
     grid-template-columns: 1fr;
   }
 }
+/* --- Slide feedback (like / dislike / comments) --- */
+
+.slide-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+.slide-feedback-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.feedback-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.feedback-btn {
+  border: 1px solid #e2e8f0;
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: 0.8rem;
+  background: #f9fafb;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.feedback-btn:hover {
+  background: #f3f4f6;
+}
+
+.feedback-btn.active {
+  border-color: #2563eb;
+  background: #e0ecff;
+  font-weight: 600;
+}
+
+.feedback-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.feedback-comment-input {
+  width: 100%;
+  min-height: 48px;
+  padding: 0.4rem 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid #e5e7eb;
+  resize: vertical;
+  font-size: 0.8rem;
+  font-family: inherit;
+}
+
+.feedback-comment-input:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
+}
+
+.feedback-status {
+  font-size: 0.75rem;
+  color: #6b7280;
+}
+
+.slide-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* mobile stacking */
+@media (max-width: 640px) {
+  .slide-footer-actions {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+}
+/* --- Slide feedback (like / dislike / comments) --- */
+
+.slide-card-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+}
+
+/* row that holds buttons + comment box */
+.slide-feedback-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: 0.75rem;
+  background: radial-gradient(circle at top left, rgba(79,70,229,0.16), transparent 55%),
+              rgba(15,23,42,0.85);
+  border: 1px solid rgba(148,163,184,0.35);
+}
+
+.feedback-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+/* pill buttons: dark base, light text */
+.feedback-btn {
+  border-radius: 999px;
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  line-height: 1.2;
+  cursor: pointer;
+
+  border: 1px solid rgba(148,163,184,0.6);
+  background: rgba(15,23,42,0.9);
+  color: #e5e7eb;
+
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  transition: background 0.15s ease, border-color 0.15s ease,
+              box-shadow 0.15s ease, transform 0.1s ease;
+}
+
+.feedback-btn:hover {
+  background: rgba(30,64,175,0.9);
+  border-color: rgba(129,140,248,0.9);
+  box-shadow: 0 0 0 1px rgba(129,140,248,0.45);
+  transform: translateY(-0.5px);
+}
+
+/* active = selected reaction */
+.feedback-btn.active {
+  background: linear-gradient(135deg, #6366f1, #3b82f6);
+  border-color: transparent;
+  color: #eef2ff;
+  font-weight: 600;
+  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
+}
+
+.feedback-btn:disabled {
+  opacity: 0.55;
+  cursor: default;
+  box-shadow: none;
+  transform: none;
+}
+
+/* comment box aligned with dark card */
+.feedback-comment-input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.6rem;
+  resize: vertical;
+  font-size: 0.8rem;
+  font-family: inherit;
+
+  background: rgba(15,23,42,0.95);
+  border: 1px solid rgba(148,163,184,0.5);
+  color: #e5e7eb;
+}
+
+.feedback-comment-input::placeholder {
+  color: #6b7280;
+}
+
+.feedback-comment-input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 1px rgba(79,70,229,0.7);
+}
+
+/* tiny status text */
+.feedback-status {
+  font-size: 0.75rem;
+  color: #9ca3af;
+}
+
+/* footer row: save status + button */
+.slide-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+/* mobile stacking */
+@media (max-width: 640px) {
+  .slide-footer-actions {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+  }
+}
