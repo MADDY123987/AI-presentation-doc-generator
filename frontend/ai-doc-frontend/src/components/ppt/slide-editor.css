@@ -1,8 +1,6 @@
-/* slide-editor.css - direct preview editing, no empty rulesets */
+/* slide-editor.css – compact rectangular slide cards + small feedback area */
 
-/* Keep existing .slide-card from ppt.css; only add what's needed here */
-
-/* visually hide fallback top/bottom inputs (keeps them in DOM for accessibility/programmatic use) */
+/* --- Utility: visually hidden inputs --- */
 .visually-hidden {
   position: absolute !important;
   width: 1px !important;
@@ -15,46 +13,77 @@
   border: 0 !important;
 }
 
-/* Main editable preview tweaks */
-.slide-preview-editable {
+/* --- Slide card: force 16:9 rectangle --- */
+.slide-card {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  width: 100%;
+  aspect-ratio: 16 / 9;          /* 🔴 fixed PPT-like shape */
+  overflow: hidden;
+}
+
+/* header row (Slide 1 | layout tag) */
+.slide-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 11px;
+}
+
+/* --- Main editable preview --- */
+.slide-preview {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.slide-preview-editable {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
   padding: 8px;
   border-radius: 12px;
-  border: 1px dashed rgba(255,255,255,0.03);
-  background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
+  border: 1px dashed rgba(255, 255, 255, 0.03);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
 }
 
 /* Title inside preview — editable */
 .slide-preview-title.editable {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 700;
   color: #eef2ff;
-  padding: 8px 10px;
+  padding: 6px 8px;
   border-radius: 8px;
-  background: rgba(3,7,18,0.3);
+  background: rgba(3, 7, 18, 0.35);
   outline: none;
-  min-height: 36px;
+  min-height: 30px;
+  max-height: 34px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* content area */
 .slide-preview-content {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   color: #d1d5db;
-  font-size: 0.86rem;
+  font-size: 0.8rem;
+  overflow: auto;              /* 🔵 scroll when text is long */
 }
 
 /* Bullet editor: present each bullet as a block (div) for predictable editing */
 .slide-bullet-editor.editable {
-  min-height: 120px;
-  padding: 10px;
+  min-height: 70px;
+  padding: 8px;
   border-radius: 8px;
-  background: rgba(2,6,23,0.3);
-  border: 1px solid rgba(255,255,255,0.02);
-  line-height: 1.38;
+  background: rgba(2, 6, 23, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.02);
+  line-height: 1.35;
   overflow: auto;
   white-space: pre-wrap;
   word-break: break-word;
@@ -69,17 +98,17 @@
 .slide-preview-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px;
+  gap: 8px;
 }
 
 .slide-preview-col.editable {
-  min-height: 120px;
-  padding: 10px;
+  min-height: 70px;
+  padding: 8px;
   border-radius: 8px;
-  background: rgba(2,6,23,0.28);
-  border: 1px solid rgba(255,255,255,0.02);
+  background: rgba(2, 6, 23, 0.28);
+  border: 1px solid rgba(255, 255, 255, 0.02);
   overflow: auto;
-  line-height: 1.36;
+  line-height: 1.32;
   white-space: pre-wrap;
   word-break: break-word;
 }
@@ -88,35 +117,35 @@
 .slide-image-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 8px;
+  gap: 6px;
 }
 
 .slide-preview-image-box {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 140px;
+  min-height: 90px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.03);
-  background: rgba(2,6,23,0.22);
+  border: 1px solid rgba(255, 255, 255, 0.03);
+  background: rgba(2, 6, 23, 0.22);
   overflow: hidden;
 }
 
 .slide-preview-image {
   max-width: 100%;
-  max-height: 220px;
+  max-height: 150px;
   object-fit: contain;
 }
 
 /* Image caption editable */
 .slide-image-caption.editable {
-  padding: 8px;
-  font-size: 0.84rem;
+  padding: 6px;
+  font-size: 0.78rem;
   color: #cbd5e1;
   border-radius: 8px;
-  background: rgba(2,6,23,0.14);
-  border: 1px dashed rgba(255,255,255,0.02);
-  min-height: 42px;
+  background: rgba(2, 6, 23, 0.14);
+  border: 1px dashed rgba(255, 255, 255, 0.02);
+  min-height: 34px;
 }
 
 /* Hide fallback controls visually but keep accessible for screen readers/programmatic */
@@ -126,163 +155,44 @@
 
 /* focus styles for keyboard users */
 .editable:focus {
-  outline: 2px solid rgba(99,102,241,0.35);
-  box-shadow: 0 0 0 2px rgba(99,102,241,0.08);
+  outline: 2px solid rgba(99, 102, 241, 0.35);
+  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.08);
 }
 
-/* footer */
+/* --- Compact footer: feedback + save --- */
 .slide-card-footer {
-  margin-top: 10px;
+  margin-top: 4px;
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  gap: 10px;
+  align-items: flex-end;
+  gap: 8px;
+  font-size: 11px;
 }
 
-.save-status {
-  color: #9ca3af;
-  font-size: 12px;
-}
-
-/* slide save button (copied / small) */
-.slide-save-btn {
-  padding: 6px 14px;
-  border-radius: 999px;
-  border: none;
-  background: linear-gradient(135deg, #6366f1, #3b82f6);
-  color: #eef2ff;
-  font-size: 0.86rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* small screens: stack columns */
-@media (max-width: 720px) {
-  .slide-preview-cols {
-    grid-template-columns: 1fr;
-  }
-}
-/* --- Slide feedback (like / dislike / comments) --- */
-
-.slide-card-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-}
-
+/* left side: like/dislike + comment */
 .slide-feedback-row {
+  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 0.4rem;
+  gap: 4px;
 }
 
 .feedback-buttons {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 4px;
   flex-wrap: wrap;
 }
 
 .feedback-btn {
-  border: 1px solid #e2e8f0;
   border-radius: 999px;
-  padding: 4px 10px;
-  font-size: 0.8rem;
-  background: #f9fafb;
-  cursor: pointer;
-  line-height: 1.2;
-}
-
-.feedback-btn:hover {
-  background: #f3f4f6;
-}
-
-.feedback-btn.active {
-  border-color: #2563eb;
-  background: #e0ecff;
-  font-weight: 600;
-}
-
-.feedback-btn:disabled {
-  opacity: 0.5;
-  cursor: default;
-}
-
-.feedback-comment-input {
-  width: 100%;
-  min-height: 48px;
-  padding: 0.4rem 0.6rem;
-  border-radius: 0.5rem;
-  border: 1px solid #e5e7eb;
-  resize: vertical;
-  font-size: 0.8rem;
-  font-family: inherit;
-}
-
-.feedback-comment-input:focus {
-  outline: none;
-  border-color: #2563eb;
-  box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.25);
-}
-
-.feedback-status {
-  font-size: 0.75rem;
-  color: #6b7280;
-}
-
-.slide-footer-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
-}
-
-/* mobile stacking */
-@media (max-width: 640px) {
-  .slide-footer-actions {
-    flex-direction: column-reverse;
-    align-items: flex-start;
-  }
-}
-/* --- Slide feedback (like / dislike / comments) --- */
-
-.slide-card-footer {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  margin-top: 0.75rem;
-}
-
-/* row that holds buttons + comment box */
-.slide-feedback-row {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  padding: 0.6rem 0.75rem;
-  border-radius: 0.75rem;
-  background: radial-gradient(circle at top left, rgba(79,70,229,0.16), transparent 55%),
-              rgba(15,23,42,0.85);
-  border: 1px solid rgba(148,163,184,0.35);
-}
-
-.feedback-buttons {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-}
-
-/* pill buttons: dark base, light text */
-.feedback-btn {
-  border-radius: 999px;
-  padding: 4px 12px;
-  font-size: 0.8rem;
+  padding: 2px 8px;
+  font-size: 10px;
   line-height: 1.2;
   cursor: pointer;
 
-  border: 1px solid rgba(148,163,184,0.6);
-  background: rgba(15,23,42,0.9);
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  background: rgba(15, 23, 42, 0.9);
   color: #e5e7eb;
 
   display: inline-flex;
@@ -293,19 +203,18 @@
 }
 
 .feedback-btn:hover {
-  background: rgba(30,64,175,0.9);
-  border-color: rgba(129,140,248,0.9);
-  box-shadow: 0 0 0 1px rgba(129,140,248,0.45);
+  background: rgba(30, 64, 175, 0.9);
+  border-color: rgba(129, 140, 248, 0.9);
+  box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.45);
   transform: translateY(-0.5px);
 }
 
-/* active = selected reaction */
 .feedback-btn.active {
   background: linear-gradient(135deg, #6366f1, #3b82f6);
   border-color: transparent;
   color: #eef2ff;
   font-weight: 600;
-  box-shadow: 0 8px 22px rgba(37, 99, 235, 0.35);
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
 }
 
 .feedback-btn:disabled {
@@ -315,18 +224,19 @@
   transform: none;
 }
 
-/* comment box aligned with dark card */
+/* smaller comment box */
 .feedback-comment-input {
   width: 100%;
-  min-height: 52px;
-  padding: 0.5rem 0.65rem;
-  border-radius: 0.6rem;
+  min-height: 26px;
+  max-height: 40px;
+  padding: 4px 6px;
+  border-radius: 8px;
   resize: vertical;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   font-family: inherit;
 
-  background: rgba(15,23,42,0.95);
-  border: 1px solid rgba(148,163,184,0.5);
+  background: rgba(15, 23, 42, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.5);
   color: #e5e7eb;
 }
 
@@ -337,27 +247,48 @@
 .feedback-comment-input:focus {
   outline: none;
   border-color: #6366f1;
-  box-shadow: 0 0 0 1px rgba(79,70,229,0.7);
+  box-shadow: 0 0 0 1px rgba(79, 70, 229, 0.7);
 }
 
 /* tiny status text */
 .feedback-status {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #9ca3af;
 }
 
-/* footer row: save status + button */
+/* right side: save status + button */
 .slide-footer-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 0.75rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
 }
 
-/* mobile stacking */
+.save-status {
+  color: #9ca3af;
+  font-size: 10px;
+}
+
+.slide-save-btn {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid #38bdf8;
+  background: #0f172a;
+  color: #eef2ff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* small screens: stack two columns into one */
+@media (max-width: 720px) {
+  .slide-preview-cols {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 640px) {
   .slide-footer-actions {
-    flex-direction: column-reverse;
     align-items: flex-start;
   }
 }
