@@ -1,4 +1,4 @@
-/* slide-editor.css – compact rectangular slide cards + small feedback area */
+/* slide-editor.css – rectangular PPT-style thumbnails + compact feedback */
 
 /* --- Utility: visually hidden inputs --- */
 .visually-hidden {
@@ -13,12 +13,13 @@
   border: 0 !important;
 }
 
-/* --- Slide card: structural layout only (visuals in ppt.css) --- */
+/* --- Slide card: only structural; visual styles are in ppt.css --- */
 .slide-card {
   display: flex;
   flex-direction: column;
   gap: 8px;
   width: 100%;
+  height: 100%;
   overflow: hidden;
 }
 
@@ -35,6 +36,9 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  gap: 6px;
+  /* 👇 makes the inside look like a real slide */
+  aspect-ratio: 16 / 9;
   overflow: hidden;
 }
 
@@ -157,7 +161,7 @@
   box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.08);
 }
 
-/* --- Ultra-compact footer: feedback + save --- */
+/* --- Compact footer: feedback + save --- */
 .slide-card-footer {
   margin-top: 4px;
   display: flex;
@@ -168,7 +172,6 @@
 }
 
 /* left side: like/dislike + comment */
-
 .feedback-buttons {
   display: flex;
   align-items: center;
@@ -182,11 +185,9 @@
   font-size: 10px;
   line-height: 1.2;
   cursor: pointer;
-
   border: 1px solid rgba(148, 163, 184, 0.6);
   background: rgba(15, 23, 42, 0.9);
   color: #e5e7eb;
-
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
@@ -238,7 +239,6 @@
   resize: vertical;
   font-size: 0.7rem;
   font-family: inherit;
-
   background: rgba(15, 23, 42, 0.95);
   border: 1px solid rgba(148, 163, 184, 0.4);
   color: #e5e7eb;
