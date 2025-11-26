@@ -1,14 +1,13 @@
 // src/components/dashboard/Dashboard.jsx
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./dashboard.css";
 import { BASE_URL, AUTH_BASE_URL } from "../../config";
 
-
 // Use Render backend everywhere (no localhost)
 // BASE_URL already includes /api/v1
-const API_BASE = BASE_URL;          // -> https://.../api/v1
-const API_HOST = AUTH_BASE_URL;     // -> https://... (without /api/v1)
-
+const API_BASE = BASE_URL; // -> https://.../api/v1
+const API_HOST = AUTH_BASE_URL; // -> https://... (without /api/v1)
 
 function Dashboard({ user }) {
   const [loading, setLoading] = useState(true);
@@ -17,6 +16,9 @@ function Dashboard({ user }) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalContent, setModalContent] = useState({ title: "", body: "" });
   const [modalLoading, setModalLoading] = useState(false);
+  const [showCreateMenu, setShowCreateMenu] = useState(false);
+
+  const navigate = useNavigate();
 
   const getAuthHeaders = () => {
     const token = localStorage.getItem("authToken");
@@ -51,47 +53,47 @@ function Dashboard({ user }) {
     }
   };
 
- useEffect(() => {
-  const fetchData = async () => {
-    const headers = {
-      Accept: "application/json",
-      ...getAuthHeaders(),
+  useEffect(() => {
+    const fetchData = async () => {
+      const headers = {
+        Accept: "application/json",
+        ...getAuthHeaders(),
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/dashboard/items`, {
+          headers,
+        });
+
+        // Handle fresh dashboard: 404 means no data created yet
+        if (res.status === 404) {
+          console.log("Dashboard: No items found yet (404)");
+          setItems(null); // triggers empty state UI
+          setError(""); // no red error message
+        } else {
+          const data = await res.json();
+
+          if (!res.ok) {
+            console.error("Dashboard API error:", res.status, data);
+            setError(
+              data.detail || `Backend error: ${res.status} ${res.statusText}`
+            );
+            setItems(null);
+          } else {
+            setItems(data);
+            setError(""); // ensure no leftover error shows
+          }
+        }
+      } catch (err) {
+        console.error("Dashboard fetch failed:", err);
+        setError(err.message || "Unknown error");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    try {
-      const res = await fetch(`${API_BASE}/dashboard/items`, {
-        headers,
-      });
-
-      // Handle fresh dashboard: 404 means no data created yet
-      if (res.status === 404) {
-        console.log("Dashboard: No items found yet (404)");
-        setItems(null); // triggers empty state UI
-        setError("");   // no red error message
-      } else {
-        const data = await res.json();
-
-        if (!res.ok) {
-          console.error("Dashboard API error:", res.status, data);
-          setError(
-            data.detail || `Backend error: ${res.status} ${res.statusText}`
-          );
-          setItems(null);
-        } else {
-          setItems(data);
-          setError(""); // ensure no leftover error shows
-        }
-      }
-    } catch (err) {
-      console.error("Dashboard fetch failed:", err);
-      setError(err.message || "Unknown error");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  fetchData();
-}, [user]);
+    fetchData();
+  }, [user]);
 
   const formatDate = (value) => {
     if (!value) return "no date";
@@ -103,7 +105,7 @@ function Dashboard({ user }) {
   };
 
   const makePreviewText = (item) => {
-    const MAX_CHARS = 280;
+    const MAX_CHARS = 160;
     if (!item) return "";
 
     if (item.summary && String(item.summary).trim())
@@ -155,7 +157,7 @@ function Dashboard({ user }) {
         ? candidate.slice(0, MAX_CHARS) + "…"
         : candidate;
 
-    return `Item #${item.id || "?"}`;
+    return ``;
   };
 
   const openReadMore = async (item, type = "presentation") => {
@@ -250,6 +252,65 @@ function Dashboard({ user }) {
     setModalContent({ title: "", body: "" });
   };
 
+  const handleCreateClick = () => {
+    setShowCreateMenu((v) => !v);
+  };
+
+  const handleCreate = (kind) => {
+    setShowCreateMenu(false);
+    if (kind === "ppt") {
+      // 🔁 change this route to whatever you use for PptGenerator
+      navigate("/ppt-generator");
+    } else {
+      // 🔁 change this route to whatever you use for WordGenerator
+      navigate("/word-generator");
+    }
+  };
+
+  // ------------- build "flat" Overleaf-style project list -------------
+
+  const presentations = items?.presentations || [];
+  const documents = items?.projects || items?.documents || [];
+
+  const projects = [
+    ...presentations.map((p) => ({
+      id: p.id,
+      kind: "PPT",
+      ext: "pptx",
+      title: p.title || p.topic || "Untitled deck",
+      created_at: p.created_at,
+      preview: makePreviewText(p),
+      raw: p,
+      downloadUrl:
+        p.download_endpoint &&
+        (p.download_endpoint.startsWith("http")
+          ? p.download_endpoint
+          : `${API_HOST}${p.download_endpoint}`),
+    })),
+    ...documents.map((d) => {
+      const type = (d.type || "DOCX").toUpperCase();
+      const ext = (d.type || "docx").toLowerCase();
+      return {
+        id: d.id,
+        kind: type,
+        ext,
+        title: d.title || "Untitled document",
+        created_at: d.created_at,
+        preview: makePreviewText(d),
+        raw: d,
+        downloadUrl:
+          d.download_endpoint &&
+          (d.download_endpoint.startsWith("http")
+            ? d.download_endpoint
+            : `${API_HOST}${d.download_endpoint}`),
+      };
+    }),
+  ].sort((a, b) => {
+    const ta = a.created_at ? new Date(a.created_at).getTime() : 0;
+    const tb = b.created_at ? new Date(b.created_at).getTime() : 0;
+    return tb - ta;
+  });
+
   if (loading) {
     return (
       <div className="dashboard-page">
@@ -268,205 +329,132 @@ function Dashboard({ user }) {
     );
   }
 
-  if (!items) {
-    return (
-      <div className="dashboard-page">
-        <p className="dashboard-empty">
-          No data found yet. Try creating a PPT or Word document first.
-        </p>
-      </div>
-    );
-  }
-
-  const presentations = items.presentations || [];
-  const documents = items.projects || items.documents || [];
-  const allEmpty = presentations.length === 0 && documents.length === 0;
-
   return (
     <div className="dashboard-page">
-      <header className="dashboard-header">
-        <h1 className="dashboard-title-main">
-          Welcome, {user?.email || "User"}
-        </h1>
-        <p className="dashboard-subtitle">
-          Quick view of your AI-generated decks and documents.
-        </p>
-      </header>
+      <div className="dashboard-header-main">
+        <header className="dashboard-header">
+          <h1 className="dashboard-title-main">
+            Welcome, {user?.email || "User"}
+          </h1>
+          <p className="dashboard-subtitle">
+            Quick view of your AI-generated decks and documents.
+          </p>
+        </header>
 
-      {allEmpty && (
-        <div className="dashboard-empty">
-          <p>No projects yet.</p>
+        <div className="dashboard-header-actions">
+          <button className="dashboard-new-btn" onClick={handleCreateClick}>
+            + New project
+          </button>
+
+          {showCreateMenu && (
+            <div className="dashboard-new-menu">
+              <button
+                className="dashboard-new-menu-item"
+                onClick={() => handleCreate("ppt")}
+              >
+                Create PPT presentation
+              </button>
+              <button
+                className="dashboard-new-menu-item"
+                onClick={() => handleCreate("doc")}
+              >
+                Create Word document
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {projects.length === 0 ? (
+        <div className="dashboard-empty-shell">
+          <p className="dashboard-empty-title">You don&apos;t have projects yet.</p>
           <p className="dashboard-empty-sub">
-            Generate your first PPT or Word document from the top navigation,
-            and it will appear here automatically.
+            Click <strong>New project</strong> to generate your first PPT or Word
+            document. It will show up here automatically.
           </p>
         </div>
-      )}
+      ) : (
+        <section className="dashboard-projects">
+          <div className="dashboard-table-header">
+            <div className="dashboard-th-title">Title</div>
+            <div className="dashboard-th-type">Type</div>
+            <div className="dashboard-th-date">Created</div>
+            <div className="dashboard-th-actions">Actions</div>
+          </div>
 
-      {!allEmpty && (
-        <>
-          <section className="dashboard-section">
-            <div className="dashboard-section-header">
-              <h2>Recent Presentations</h2>
-              <span className="dashboard-count">
-                {presentations.length} total
-              </span>
-            </div>
+          <div className="dashboard-table-body">
+            {projects.map((proj) => {
+              const item = proj.raw;
+              const isPresentation = proj.kind === "PPT";
 
-            {presentations.length === 0 ? (
-              <p className="dashboard-section-empty">
-                No presentations yet.
-              </p>
-            ) : (
-              <div className="dashboard-grid">
-                {presentations.map((p) => {
-                  const previewText = makePreviewText(p);
-                  const downloadUrl =
-                    p.download_endpoint &&
-                    (p.download_endpoint.startsWith("http")
-                      ? p.download_endpoint
-                      : `${API_HOST}${p.download_endpoint}`);
-
-                  return (
-                    <article className="dashboard-card" key={p.id}>
-                      <div className="dashboard-card-top">
-                        <span className="dashboard-type-pill">PPT</span>
-                        <span className="dashboard-type">Presentation</span>
+              return (
+                <div
+                  className="dashboard-project-row"
+                  key={`${proj.kind}-${proj.id}`}
+                >
+                  <div className="dashboard-project-main">
+                    <input
+                      type="checkbox"
+                      className="dashboard-checkbox"
+                      disabled
+                    />
+                    <div className="dashboard-project-title-block">
+                      <div className="dashboard-project-title-text">
+                        {proj.title}
                       </div>
+                      {proj.preview && (
+                        <div className="dashboard-project-preview">
+                          {proj.preview}
+                        </div>
+                      )}
+                    </div>
+                  </div>
 
-                      <h3 className="dashboard-card-title">
-                        {p.title || p.topic || "Untitled deck"}
-                      </h3>
+                  <div className="dashboard-project-type-cell">
+                    <span className="dashboard-type-pill">{proj.kind}</span>
+                  </div>
 
-                      <div className="dashboard-card-desc">
-                        {previewText}
-                      </div>
+                  <div className="dashboard-project-date">
+                    {formatDate(proj.created_at)}
+                  </div>
 
-                      <p className="dashboard-date">
-                        Created: {formatDate(p.created_at)}
-                      </p>
-
-                      <div
-                        style={{
-                          marginTop: "auto",
-                          display: "flex",
-                          gap: 8,
-                        }}
+                  <div className="dashboard-project-actions">
+                    <button
+                      className="dashboard-row-btn"
+                      onClick={() =>
+                        openReadMore(
+                          item,
+                          isPresentation ? "presentation" : "document"
+                        )
+                      }
+                    >
+                      Open
+                    </button>
+                    {proj.downloadUrl && (
+                      <button
+                        className="dashboard-row-btn dashboard-row-btn-ghost"
+                        onClick={() =>
+                          handleDownload(
+                            proj.downloadUrl,
+                            `${proj.title || (isPresentation
+                              ? "presentation"
+                              : "document")}.${proj.ext}`
+                          )
+                        }
                       >
-                        <button
-                          className="dashboard-open-btn"
-                          onClick={() => openReadMore(p, "presentation")}
-                        >
-                          Read more
-                        </button>
-
-                        {downloadUrl ? (
-                          <button
-                            className="dashboard-open-btn"
-                            onClick={() =>
-                              handleDownload(
-                                downloadUrl,
-                                `${p.title || p.topic || "presentation"}.pptx`
-                              )
-                            }
-                          >
-                            Download PPTX
-                          </button>
-                        ) : null}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-
-          <section className="dashboard-section">
-            <div className="dashboard-section-header">
-              <h2>Recent Documents</h2>
-              <span className="dashboard-count">
-                {documents.length} total
-              </span>
-            </div>
-
-            {documents.length === 0 ? (
-              <p className="dashboard-section-empty">
-                No documents yet.
-              </p>
-            ) : (
-              <div className="dashboard-grid">
-                {documents.map((d) => {
-                  const previewText = makePreviewText(d);
-                  const downloadUrl =
-                    d.download_endpoint &&
-                    (d.download_endpoint.startsWith("http")
-                      ? d.download_endpoint
-                      : `${API_HOST}${d.download_endpoint}`);
-                  return (
-                    <article className="dashboard-card" key={d.id}>
-                      <div className="dashboard-card-top">
-                        <span className="dashboard-type-pill">
-                          {(d.type || "DOC").toUpperCase()}
-                        </span>
-                        <span className="dashboard-type">Document</span>
-                      </div>
-
-                      <h3 className="dashboard-card-title">
-                        {d.title || "Untitled document"}
-                      </h3>
-
-                      <div className="dashboard-card-desc">
-                        {previewText}
-                      </div>
-
-                      <p className="dashboard-date">
-                        Created: {formatDate(d.created_at)}
-                      </p>
-
-                      <div
-                        style={{
-                          marginTop: "auto",
-                          display: "flex",
-                          gap: 8,
-                        }}
-                      >
-                        <button
-                          className="dashboard-open-btn"
-                          onClick={() => openReadMore(d, "document")}
-                        >
-                          Read more
-                        </button>
-
-                        {downloadUrl ? (
-                          <button
-                            className="dashboard-open-btn"
-                            onClick={() =>
-                              handleDownload(
-                                downloadUrl,
-                                `${d.title || "document"}.${(
-                                  d.type || "docx"
-                                ).toLowerCase()}`
-                              )
-                            }
-                          >
-                            Download {d.type?.toUpperCase() || "DOCX"}
-                          </button>
-                        ) : null}
-                      </div>
-                    </article>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-        </>
+                        Download
+                      </button>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       )}
 
       {modalOpen && (
-        <div
-          className="dashboard-modal-overlay"
-          onClick={closeModal}
-        >
+        <div className="dashboard-modal-overlay" onClick={closeModal}>
           <div
             className="dashboard-modal"
             onClick={(e) => e.stopPropagation()}

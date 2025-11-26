@@ -1,6 +1,6 @@
-/* slide-editor.css – rectangular PPT-style thumbnails + compact feedback */
+/* slide-editor.css */
 
-/* --- Utility: visually hidden inputs --- */
+/* ===== helpers ===== */
 .visually-hidden {
   position: absolute !important;
   width: 1px !important;
@@ -13,80 +13,108 @@
   border: 0 !important;
 }
 
-/* --- Slide card: only structural; visual styles are in ppt.css --- */
+/* ===== slide card + header ===== */
+
 .slide-card {
+  background: radial-gradient(circle at top left, rgba(59,130,246,0.16), transparent 55%),
+              rgba(15,23,42,0.96);
+  border-radius: 1rem;
+  padding: 0.9rem;
+  border: 1px solid rgba(148,163,184,0.4);
+  box-shadow: 0 18px 40px rgba(15,23,42,0.7);
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
 }
 
-/* header row (Slide 1 | layout tag) */
+/* if parent uses flex, make cards 2 per row */
+.slides-grid .slide-card,
+.slide-grid .slide-card {
+  flex: 0 0 calc(50% - 0.9rem);
+}
+
+/* if parent uses grid with these classes, force 2 columns */
+.slides-grid,
+.slide-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  gap: 1.3rem;
+}
+
+/* responsive: 1 per row on narrow screens */
+@media (max-width: 960px) {
+  .slides-grid,
+  .slide-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .slides-grid .slide-card,
+  .slide-grid .slide-card {
+    flex-basis: 100%;
+  }
+}
+
 .slide-card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 11px;
+  margin-bottom: 0.4rem;
 }
 
-/* --- Main editable preview --- */
-.slide-preview {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  /* 👇 makes the inside look like a real slide */
-  aspect-ratio: 16 / 9;
-  overflow: hidden;
+.slide-badge {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.8);
+  color: #e5e7eb;
 }
+
+.slide-layout-pill {
+  font-size: 0.75rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(30,64,175,0.9);
+  color: #e5e7eb;
+}
+
+/* ===== slide preview ===== */
 
 .slide-preview-editable {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   padding: 8px;
   border-radius: 12px;
-  border: 1px dashed rgba(255, 255, 255, 0.03);
-  background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), transparent);
+  border: 1px dashed rgba(255,255,255,0.03);
+  background: linear-gradient(180deg, rgba(255,255,255,0.01), transparent);
 }
 
-/* Title inside preview — editable */
 .slide-preview-title.editable {
-  font-size: 0.9rem;
+  font-size: 0.92rem;
   font-weight: 700;
   color: #eef2ff;
-  padding: 6px 8px;
+  padding: 8px 10px;
   border-radius: 8px;
-  background: rgba(3, 7, 18, 0.35);
+  background: rgba(3,7,18,0.3);
   outline: none;
-  min-height: 30px;
-  max-height: 34px;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-height: 36px;
 }
 
-/* content area */
 .slide-preview-content {
-  flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
   color: #d1d5db;
-  font-size: 0.8rem;
-  overflow: auto; /* scroll when text is long */
+  font-size: 0.86rem;
 }
 
-/* Bullet editor: each bullet as block */
+/* bullets */
 .slide-bullet-editor.editable {
-  min-height: 70px;
-  padding: 8px;
+  min-height: 120px;
+  padding: 10px;
   border-radius: 8px;
-  background: rgba(2, 6, 23, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.02);
-  line-height: 1.35;
+  background: rgba(2,6,23,0.3);
+  border: 1px solid rgba(255,255,255,0.02);
+  line-height: 1.38;
   overflow: auto;
   white-space: pre-wrap;
   word-break: break-word;
@@ -96,198 +124,186 @@
   padding: 2px 0;
 }
 
-/* Two-column editable columns */
+/* two-column */
 .slide-preview-cols {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 8px;
+  gap: 10px;
 }
 
 .slide-preview-col.editable {
-  min-height: 70px;
-  padding: 8px;
+  min-height: 120px;
+  padding: 10px;
   border-radius: 8px;
-  background: rgba(2, 6, 23, 0.28);
-  border: 1px solid rgba(255, 255, 255, 0.02);
+  background: rgba(2,6,23,0.28);
+  border: 1px solid rgba(255,255,255,0.02);
   overflow: auto;
-  line-height: 1.32;
+  line-height: 1.36;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
-/* Image slide layout */
+/* image layout */
 .slide-image-layout {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 6px;
+  gap: 8px;
 }
 
 .slide-preview-image-box {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 90px;
+  min-height: 140px;
   border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.03);
-  background: rgba(2, 6, 23, 0.22);
+  border: 1px solid rgba(255,255,255,0.03);
+  background: rgba(2,6,23,0.22);
   overflow: hidden;
 }
 
 .slide-preview-image {
   max-width: 100%;
-  max-height: 150px;
+  max-height: 220px;
   object-fit: contain;
 }
 
-/* Image caption editable */
 .slide-image-caption.editable {
-  padding: 6px;
-  font-size: 0.78rem;
+  padding: 8px;
+  font-size: 0.84rem;
   color: #cbd5e1;
   border-radius: 8px;
-  background: rgba(2, 6, 23, 0.14);
-  border: 1px dashed rgba(255, 255, 255, 0.02);
-  min-height: 34px;
+  background: rgba(2,6,23,0.14);
+  border: 1px dashed rgba(255,255,255,0.02);
+  min-height: 42px;
 }
 
-/* Hide fallback controls visually but keep accessible */
+/* hide fallback controls */
 .slide-hidden-controls {
   display: none;
 }
 
-/* focus styles for keyboard users */
+/* focus */
 .editable:focus {
-  outline: 2px solid rgba(99, 102, 241, 0.35);
-  box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.08);
+  outline: 2px solid rgba(99,102,241,0.35);
+  box-shadow: 0 0 0 2px rgba(99,102,241,0.08);
 }
 
-/* --- Compact footer: feedback + save --- */
-.slide-card-footer {
-  margin-top: 4px;
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 8px;
-  font-size: 11px;
-}
-
-/* left side: like/dislike + comment */
-.feedback-buttons {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-wrap: wrap;
-}
-
-.feedback-btn {
-  border-radius: 999px;
-  padding: 2px 8px;
-  font-size: 10px;
-  line-height: 1.2;
-  cursor: pointer;
-  border: 1px solid rgba(148, 163, 184, 0.6);
-  background: rgba(15, 23, 42, 0.9);
-  color: #e5e7eb;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.25rem;
-  transition: background 0.15s ease, border-color 0.15s ease,
-    box-shadow 0.15s ease, transform 0.1s ease;
-}
-
-.feedback-btn:hover {
-  background: rgba(30, 64, 175, 0.9);
-  border-color: rgba(129, 140, 248, 0.9);
-  box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.45);
-  transform: translateY(-0.5px);
-}
-
-.feedback-btn.active {
-  background: linear-gradient(135deg, #6366f1, #3b82f6);
-  border-color: transparent;
-  color: #eef2ff;
-  font-weight: 600;
-  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.35);
-}
-
-.feedback-btn:disabled {
-  opacity: 0.55;
-  cursor: default;
-  box-shadow: none;
-  transform: none;
-}
-
-/* feedback container */
-.slide-feedback-row {
-  flex: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 4px 6px;
-  border-radius: 6px;
-  background: rgba(15, 23, 42, 0.7);
-  border: 1px solid rgba(148, 163, 184, 0.25);
-}
-
-/* smaller comment box */
-.feedback-comment-input {
-  width: 100%;
-  min-height: 32px;
-  max-height: 50px;
-  padding: 2px 4px;
-  border-radius: 6px;
-  resize: vertical;
-  font-size: 0.7rem;
-  font-family: inherit;
-  background: rgba(15, 23, 42, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.4);
-  color: #e5e7eb;
-}
-
-.feedback-comment-input::placeholder {
-  font-size: 0.68rem;
-  color: #64748b;
-}
-
-/* tiny status text */
-.feedback-status {
-  font-size: 0.7rem;
-  color: #9ca3af;
-}
-
-/* right side: save status + button */
-.slide-footer-actions {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 4px;
-}
-
-.save-status {
-  color: #9ca3af;
-  font-size: 10px;
-}
-
-.slide-save-btn {
-  padding: 4px 10px;
-  border-radius: 999px;
-  border: 1px solid #38bdf8;
-  background: #0f172a;
-  color: #eef2ff;
-  font-size: 0.8rem;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-/* small screens: stack two columns into one */
+/* stack columns on small screens */
 @media (max-width: 720px) {
   .slide-preview-cols {
     grid-template-columns: 1fr;
   }
 }
 
+/* ===== tiny feedback + save footer ===== */
+
+.slide-card-footer {
+  margin-top: 0.65rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+/* compact inline feedback row */
+.slide-feedback-row {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.15rem 0.25rem;
+  border-radius: 999px;
+  background: rgba(15,23,42,0.75);
+}
+
+/* like / dislike buttons small pills */
+.feedback-buttons {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.feedback-btn {
+  border-radius: 999px;
+  padding: 2px 6px;
+  font-size: 0.7rem;
+  line-height: 1;
+  cursor: pointer;
+  border: 1px solid rgba(148,163,184,0.7);
+  background: rgba(15,23,42,0.9);
+  color: #e5e7eb;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.feedback-btn:hover {
+  background: rgba(30,64,175,0.9);
+  border-color: rgba(129,140,248,0.9);
+}
+
+.feedback-btn.active {
+  background: linear-gradient(135deg, #6366f1, #3b82f6);
+  border-color: transparent;
+}
+
+/* tiny comment box */
+.feedback-comment-input {
+  max-width: 170px;
+  min-height: 24px;
+  padding: 0.1rem 0.3rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148,163,184,0.7);
+  background: rgba(15,23,42,0.95);
+  color: #e5e7eb;
+  font-size: 0.7rem;
+  resize: none;
+}
+
+.feedback-comment-input::placeholder {
+  color: #6b7280;
+}
+
+.feedback-status {
+  font-size: 0.65rem;
+  color: #9ca3af;
+  white-space: nowrap;
+}
+
+/* save part */
+.slide-footer-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.save-status {
+  color: #9ca3af;
+  font-size: 0.75rem;
+}
+
+.slide-save-btn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: none;
+  background: linear-gradient(135deg, #6366f1, #3b82f6);
+  color: #eef2ff;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* stack footer on very small screens */
 @media (max-width: 640px) {
+  .slide-card-footer {
+    gap: 0.35rem;
+  }
+
   .slide-footer-actions {
+    flex-direction: column-reverse;
     align-items: flex-start;
+  }
+
+  .feedback-comment-input {
+    max-width: 100%;
   }
 }

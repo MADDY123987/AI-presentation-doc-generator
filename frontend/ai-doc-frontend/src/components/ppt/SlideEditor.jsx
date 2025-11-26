@@ -20,7 +20,7 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
   const [saving, setSaving] = useState(false);
   const [statusMsg, setStatusMsg] = useState("Saved");
 
-  // 👇 NEW: per-slide feedback state
+  // per-slide feedback state
   const [reaction, setReaction] = useState(slide.reaction || null); // "like" | "dislike" | null
   const [comment, setComment] = useState(slide.comment || "");
   const [feedbackSaving, setFeedbackSaving] = useState(false);
@@ -46,7 +46,7 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
     setImageUrl(slide.image_url || SAMPLE_IMAGE);
     setCaption(slide.caption || slide.description || "");
 
-    // 👇 sync feedback fields if backend sends them
+    // sync feedback fields if backend sends them
     setReaction(slide.reaction || null);
     setComment(slide.comment || "");
   }, [slide]);
@@ -142,9 +142,8 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
     await saveToBackend(payload);
   };
 
-  /* --- NEW: feedback submit helper --- */
+  // feedback submit helper
   const submitFeedback = async (nextReaction = reaction, nextComment = comment) => {
-    // if no backend id, just keep it local
     if (!presentationId) {
       setFeedbackStatus("Feedback stored locally");
       return;
@@ -156,7 +155,7 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
 
       const token = localStorage.getItem("authToken");
       const payload = {
-        reaction: nextReaction, // "like" | "dislike" | null
+        reaction: nextReaction,
         comment: nextComment,
       };
 
@@ -173,7 +172,6 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
         setFeedbackStatus("Feedback saved");
       }
 
-      // reflect in parent if needed
       if (onLocalChange) {
         onLocalChange(index, {
           ...slide,
@@ -191,23 +189,16 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
   };
 
   const handleReactionClick = (type) => {
-    // toggle behavior: click again to clear
-    const next =
-      reaction === type
-        ? null
-        : type; // either "like", "dislike", or null
-
+    const next = reaction === type ? null : type;
     setReaction(next);
     submitFeedback(next, comment);
   };
 
   const handleCommentBlur = () => {
-    // save comment when user leaves the textarea
     submitFeedback(reaction, comment);
   };
 
-  /* --- Handlers when editing the preview (contentEditable elements) --- */
-
+  // Handlers when editing the preview (contentEditable elements)
   const onTitleInput = (e) => {
     const v = e.currentTarget.innerText.replace(/\u00A0/g, " ");
     setTitle(v);
@@ -433,48 +424,42 @@ function SlideEditor({ index, slide, presentationId, onLocalChange, onSave }) {
         </label>
       </div>
 
-      {/* 🔻 FOOTER: feedback + save slide */}
+      {/* FOOTER: small feedback + save slide */}
       <div className="slide-card-footer">
         <div className="slide-feedback-row">
           <div className="feedback-buttons">
             <button
               type="button"
               className={
-                reaction === "like"
-                  ? "feedback-btn active"
-                  : "feedback-btn"
+                reaction === "like" ? "feedback-btn active" : "feedback-btn"
               }
               onClick={() => handleReactionClick("like")}
               disabled={feedbackSaving}
             >
-              👍 Like
+              👍
             </button>
             <button
               type="button"
               className={
-                reaction === "dislike"
-                  ? "feedback-btn active"
-                  : "feedback-btn"
+                reaction === "dislike" ? "feedback-btn active" : "feedback-btn"
               }
               onClick={() => handleReactionClick("dislike")}
               disabled={feedbackSaving}
             >
-              👎 Dislike
+              👎
             </button>
-
-            <span className="feedback-status">
-              {feedbackStatus}
-            </span>
           </div>
 
           <textarea
             className="feedback-comment-input"
-            placeholder="Add a comment or note for this slide (saved automatically)…"
+            placeholder="Note…"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             onBlur={handleCommentBlur}
-            rows={2}
+            rows={1}
           />
+
+          <span className="feedback-status">{feedbackStatus}</span>
         </div>
 
         <div className="slide-footer-actions">
