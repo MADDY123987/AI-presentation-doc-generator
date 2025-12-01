@@ -8,7 +8,7 @@ Deployment Link: https://ppt-and-doc-generator-3uhr.vercel.app/
 
 https://github.com/user-attachments/assets/fba6685b-e2b9-4bda-bed5-293ce9e3ae78
 
-Downlaod the Zip  File  Here: [docpptgeneratorzip.zip](https://github.com/user-attachments/files/23855604/docpptgeneratorzip.zip)
+Downlaod the Zip  File  of Video Here: [docpptgeneratorzip.zip](https://github.com/user-attachments/files/23855604/docpptgeneratorzip.zip)
 
 
 ## ✨ Key Features
