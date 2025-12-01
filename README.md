@@ -1,14 +1,32 @@
 # 🧠 AI Presentation & Document Generator
 
-Create professional PowerPoint presentations and Word-style documents—instantly—using AI!
+Create professional PowerPoint presentations and Word-style documents — instantly — using AI.
 
-Modern UI • Customizable • Secure Dashboard 🚀
-Deployment Link: https://ppt-and-doc-generator-3uhr.vercel.app/
+Modern UI • Customizable • Secure Dashboard 🚀  
 
+---
+
+## 🌐 Live Deployment
+
+- 🔗 **Live App:** https://ppt-and-doc-generator-3uhr.vercel.app/
+
+---
+
+## 🎥 Demo Video
+
+10-second walkthrough of the app in action:
 
 https://github.com/user-attachments/assets/fba6685b-e2b9-4bda-bed5-293ce9e3ae78
 
-Downlaod the Zip  File  of Video Here: [docpptgeneratorzip.zip](https://github.com/user-attachments/files/23855604/docpptgeneratorzip.zip)
+---
+
+## 📦 Sample Output Bundle
+
+Download a sample bundle (generated PPT/DOC assets):
+
+[📥 docpptgeneratorzip.zip](https://github.com/user-attachments/files/23855604/docpptgeneratorzip.zip)
+
+---
 
 
 ## ✨ Key Features
