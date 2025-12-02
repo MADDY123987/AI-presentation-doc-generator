@@ -42,7 +42,17 @@ Architecture
 <img width="1641" height="651" alt="Image" src="https://github.com/user-attachments/assets/6b2df76b-6c52-4a21-95e9-ec2f3ed054f9" />
 
 ---
+## 📊 API + Database Overview
 
+Below are the API routes structure and database schema design visualized side by side:
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/ad2b176f-019a-4f59-861b-7515efc47ba6" width="47%" />
+  &nbsp;&nbsp;&nbsp;
+  <img src="https://github.com/user-attachments/assets/78758a0a-c458-447a-ac32-31d891bd47c5" width="47%" />
+</p>
+
+
+---
 
 ## ✨ Key Features
 
