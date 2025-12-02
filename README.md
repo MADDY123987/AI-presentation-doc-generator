@@ -19,6 +19,26 @@ Modern UI • Customizable • Secure Dashboard 🚀
 https://github.com/user-attachments/assets/fba6685b-e2b9-4bda-bed5-293ce9e3ae78
 
 ---
+## 🗂️ Database Schema (MySQL)
+
+The application uses a relational database to store user-generated projects and presentations.
+
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/78758a0a-c458-447a-ac32-31d891bd47c5" width="70%" />
+</p>
+
+### 🔍 Tables Overview
+
+- **users** – authentication & ownership
+- **projects** – Word document metadata
+- **sections** – actual editable content blocks of a document
+- **presentations** – slide data (JSON) + export path
+
+### 🔗 Relationships
+- A user can have multiple **documents** and **presentations**
+- A document contains multiple **sections** (ordered)
+
+> This schema supports AI-generated **DOCX** and **PPTX** workflows with editable content and export features.
 
 
 
@@ -44,7 +64,7 @@ Architecture
 ---
 ## 📊  Database Overview
 
-Below is the database schema design visualized side by side:
+
 <img width="507" height="706" alt="Image" src="https://github.com/user-attachments/assets/78758a0a-c458-447a-ac32-31d891bd47c5" />
 
 ---
