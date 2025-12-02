@@ -27,6 +27,9 @@ Download a sample bundle (generated PPT/DOC assets):
 [📥 docpptgeneratorzip.zip](https://github.com/user-attachments/files/23855604/docpptgeneratorzip.zip)
 
 ---
+Architecture
+<img width="1641" height="651" alt="Image" src="https://github.com/user-attachments/assets/6b2df76b-6c52-4a21-95e9-ec2f3ed054f9" />
+
 ---
 
 ## 📝 Try the Output — Sample Files
